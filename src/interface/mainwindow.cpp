@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 void MainWindow::clearTracks(bool enabled){
+    Q_UNUSED(enabled)
     mModel.clear();
 }
 

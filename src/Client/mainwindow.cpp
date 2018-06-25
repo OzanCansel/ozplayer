@@ -78,7 +78,7 @@ void MainWindow::findOzPlayer(){
         if(socket.waitForReadyRead()){
             QByteArray datagram;
             datagram.resize(int(socket.pendingDatagramSize()));
-            auto result = socket.readDatagram(datagram.data() , datagram.size());
+            socket.readDatagram(datagram.data() , datagram.size());
             qDebug() << "Received => " << datagram;
             auto json = QJsonDocument::fromJson(datagram).object();
             if(json.isEmpty())

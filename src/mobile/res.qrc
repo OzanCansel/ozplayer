@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/img/main-bg.jpg</file>
+        <file>res/font/rock-it/Rockit.ttf</file>
+        <file>res/font/linux_libertine/LinLibertine_R.ttf</file>
+        <file>res/font/lemon_jelly/Lemon Jelly Personal Use.ttf</file>
+        <file>res/font/marielle_franco/MarielleFranco.ttf</file>
+        <file>res/font/linux_libertine/LinLibertine_RZ.ttf</file>
+        <file>res/img/note.png</file>
+        <file>res/img/folder.png</file>
+    </qresource>
+</RCC>

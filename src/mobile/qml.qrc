@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>qml/Responsive.qml</file>
+        <file>qml/qmldir</file>
+        <file>qml/TextButton.qml</file>
+        <file>qml/Connection.qml</file>
+        <file>qml/FontCollection.qml</file>
+        <file>qml/PlayerControl.qml</file>
+    </qresource>
+</RCC>

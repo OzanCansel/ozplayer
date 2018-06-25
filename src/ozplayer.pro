@@ -3,4 +3,6 @@ TEMPLATE = subdirs
 SUBDIRS += \
     interface \
     Client \
-    lib
+    ozlib \
+    server \
+    mobile

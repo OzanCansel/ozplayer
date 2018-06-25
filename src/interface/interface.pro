@@ -4,12 +4,14 @@
 #
 #-------------------------------------------------
 
-QT       += core gui multimedia
+QT       += core gui network multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = interface
 TEMPLATE = app
+
+CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -33,9 +35,9 @@ HEADERS += \
 FORMS += \
         mainwindow.ui
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../lib/release/ -llib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../lib/debug/ -llib
-else:unix: LIBS += -L$$OUT_PWD/../lib/ -llib
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ozlib/release/ -lozlib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ozlib/debug/ -lozlib
+else:unix: LIBS += -L$$OUT_PWD/../ozlib/ -lozlib
 
-INCLUDEPATH += $$PWD/../lib
-DEPENDPATH += $$PWD/../lib
+INCLUDEPATH += $$PWD/../ozlib
+DEPENDPATH += $$PWD/../ozlib
