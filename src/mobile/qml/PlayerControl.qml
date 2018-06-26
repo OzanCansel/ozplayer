@@ -119,6 +119,7 @@ Item {
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     visible: !delegateItem.isCurrent
+                    enabled : !delegateItem.isCurrent && serverList.currentIndex == index
                     onClicked:  proxy.play(delegateItem.path)
                 }
 
