@@ -98,7 +98,6 @@ Item {
                     font.family: FontCollection.connectionFontName
                     z:2
                 }
-
             }
 
             Row {
@@ -166,6 +165,104 @@ Item {
                 opacity: 1
                 z : 1
             }
+        }
+    }
+
+    Item {
+        id : volumeView
+        width : Responsive.h(800)
+        height: Responsive.v(120)
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Responsive.v(200)
+        anchors.horizontalCenter: parent.horizontalCenter
+        visible: false
+        z : 2
+
+        Slider{
+            id : volumeSlider
+            from : 0
+            to : 100
+            value: proxy.volume
+            width: parent.width * 0.8
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: parent.height
+            enabled: false
+            z : 2
+
+            background: Rectangle {
+                x: volumeSlider.leftPadding
+                y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                implicitWidth: volumeSlider.width
+                implicitHeight: Responsive.v(10)
+                width: volumeSlider.availableWidth
+                height: implicitHeight
+                radius: Responsive.v(5)
+//                color: "#bdbebf"
+                color : "#555555"
+
+//                Rectangle{
+//                    height: parent.height
+//                    width: volumeSlider.visualPosition * parent.width
+//                    color : ""
+//                }
+
+//                LinearGradient{
+//                    height : parent.height
+//                    width : volumeSlider.visualPosition * parent.width
+//                    start: Qt.point(0, 0)
+//                    end: Qt.point(width, 0)
+//                    gradient: Gradient {
+//                        GradientStop { position: 0; color: "black" }
+//                        GradientStop{ position: 1; color : "#2ec56c"}
+//                    }
+//                }
+            }
+
+            handle: Rectangle {
+                x: volumeSlider.leftPadding + volumeSlider.visualPosition * (volumeSlider.availableWidth - width)
+                y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
+                implicitWidth: Responsive.v(50)
+                implicitHeight: Responsive.v(50)
+//                color: volumeSlider.pressed ? "#f0f0f0" : "#f0f0f0"
+                color : "#ffffff"
+                radius: Responsive.v(25)
+//                border.width: Responsive.v(5)
+//                border.color: "black"
+            }
+        }
+
+        Rectangle{
+            color : "#2a2a2a"
+            anchors.fill : parent
+            radius: height * 0.15
+        }
+    }
+
+    Connections{
+        target:proxy
+        onVolumeChanged : {
+
+            volumeFadeOutAnimation.stop()
+            volumeView.visible = true
+            volumeView.opacity = 1
+            volumeFadeOutAnimation.restart()
+        }
+    }
+
+    SequentialAnimation{
+        id : volumeFadeOutAnimation
+
+
+        PauseAnimation {
+            duration: 2000
+        }
+
+        NumberAnimation{
+            target: volumeView
+            property: "opacity"
+            from: 1
+            to:0
+            duration: 500
         }
     }
 }

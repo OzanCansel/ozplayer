@@ -18,6 +18,7 @@ class PlayerProxy : public QQuickItem
     Q_PROPERTY(QString currentTrack READ currentTrack NOTIFY currentTrackChanged)
     Q_PROPERTY(int trackStatus READ trackStatus NOTIFY trackStatusChanged)
     Q_PROPERTY(QString currentDirectory READ currentDirectory NOTIFY currentDirectoryChanged)
+    Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
 
 public:
 
@@ -30,6 +31,7 @@ public:
     QString currentTrack();
     QString currentDirectory();
     int trackStatus();
+    int volume();
 
 signals:
 
@@ -40,15 +42,19 @@ signals:
     void currentTrackChanged();
     void trackStatusChanged();
     void currentDirectoryChanged();
+    void volumeChanged();
     void errorOccured(QString msg);
 
 public slots:
 
     void open(QString , int);
     void retrieveFiles(QString);
+    void retrieveCurrentTrack();
     void play(QString);
     void resume();
     void pause();
+    void volumeDown();
+    void volumeUp();
 
 private:
 
@@ -71,6 +77,7 @@ private:
     QString mCurrentDirectory;
     QString mCurrentTrack;
     int mTrackStatus;
+    int mVolume { 70 };
 
 };
 

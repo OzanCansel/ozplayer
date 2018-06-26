@@ -10,7 +10,7 @@
 #include "playcommand.h"
 #include "pausecommand.h"
 #include "resumecommand.h"
-#include "currenttracknotify.h"
+#include "volumenotify.h"
 
 void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
@@ -95,31 +95,60 @@ void PlayerService::messageIncome(){
         mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
         mPlayer.play();
 
+        mTrackStatus = TrackStatus::Playing;
+
         CurrentTrackNotify notify;
-        notify.setStatus(TrackStatus::Playing);
+        notify.setStatus(mTrackStatus);
         notify.setPath(playCmd.track());
         broadcast(notify.serialize());
     } else if(cmd == ResumeCommand::CMD){
         if(mPlayer.state() != QMediaPlayer::PlayingState){
             mPlayer.play();
+
+            mTrackStatus = TrackStatus::Playing;
+
             CurrentTrackNotify notify;
-            notify.setStatus(TrackStatus::Playing);
+
+            notify.setStatus(mTrackStatus);
             notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
             broadcast(notify.serialize());
         }
     } else if(cmd == PauseCommand::CMD){
         if(mPlayer.state() != QMediaPlayer::PausedState){
             mPlayer.pause();
+            mTrackStatus = TrackStatus::Paused;
             CurrentTrackNotify notify;
-            notify.setStatus(TrackStatus::Paused);
+            notify.setStatus(mTrackStatus);
             notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
             broadcast(notify.serialize());
         }
+    } else if(cmd == "volumeUp"){
+        auto volume = mPlayer.volume() + 5;
+        if(volume > 100)
+            volume = 100;
+        mPlayer.setVolume(volume);
+        VolumeNotify notify;
+        notify.setVolume(mPlayer.volume());
+        broadcast(notify.serialize());
+        qDebug() << "volumeUp => " << volume;
+    } else if(cmd == "volumeDown"){
+        auto volume = mPlayer.volume() - 5;
+        if(volume < 0)
+            volume = 0;
+        mPlayer.setVolume(volume);
+        VolumeNotify notify;
+        notify.setVolume(mPlayer.volume());
+        broadcast(notify.serialize());
+        qDebug() << "volumeDown => " << volume;
+    } else if(cmd == "getCurrentTrack"){
+        CurrentTrackNotify notify;
+        notify.setStatus(mTrackStatus);
+        notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+        broadcast(notify.serialize());
     }
 }
 
 void PlayerService::broadcast(QJsonObject&& json){
     auto str = QJsonDocument(json).toJson();
     for(auto socket : mClients)
-        socket->write(str);
-}
+        socket->write(str);}

@@ -6,6 +6,7 @@
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_ANDROID_VOLUME_KEYS", "1");
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     QGuiApplication app(argc, argv);

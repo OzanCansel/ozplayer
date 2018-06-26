@@ -93,6 +93,26 @@ ApplicationWindow {
             id : playerControl
             proxy: playerProxy
         }
+
+        Keys.onVolumeDownPressed: {
+            playerProxy.volumeDown()
+            event.accepted = true
+        }
+
+        Keys.onVolumeUpPressed: {
+            playerProxy.volumeUp()
+            event.accepted = true
+        }
+
+        Keys.onUpPressed: {
+            playerProxy.volumeUp()
+            event.accepted = true
+        }
+
+        Keys.onDownPressed: {
+            playerProxy.volumeDown()
+            event.accepted = true
+        }
     }
 
     Image{

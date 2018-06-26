@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QObject>
 #include <QMediaPlayer>
+#include "currenttracknotify.h"
 
 class PlayerService : public QObject
 {
@@ -32,6 +33,7 @@ private:
     QString mBasePath;
     QMediaPlayer mPlayer;
     QString mCurrentTrack;
+    TrackStatus mTrackStatus;
 
 };
 

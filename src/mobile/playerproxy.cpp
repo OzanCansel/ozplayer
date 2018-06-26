@@ -6,13 +6,16 @@
 #include <QRegularExpressionMatch>
 #include <QFileInfo>
 #include <QDir>
+#include <QTimer>
 #include "networkutil.h"
 #include "retrieveentriescommand.h"
 #include "entrylistresult.h"
 #include "playcommand.h"
 #include "pausecommand.h"
 #include "resumecommand.h"
+#include "namedcommand.h"
 #include "currenttracknotify.h"
+#include "volumenotify.h"
 
 void PlayerProxy::registerQmlType(){
     qmlRegisterType<PlayerProxy>("mobile" , 1 , 0 , "PlayerProxy");
@@ -21,7 +24,8 @@ void PlayerProxy::registerQmlType(){
 PlayerProxy::PlayerProxy()
 {
     connect(&mSocket , &QTcpSocket::readyRead , this , &PlayerProxy::messageIncome);
-    //open(QString("192.168.42.129") , )
+    mVolume = 70;
+    emit volumeChanged();
 }
 
 void PlayerProxy::open(QString host, int port){
@@ -36,6 +40,7 @@ void PlayerProxy::open(QString host, int port){
 
     if(mSocket.isOpen()){
         retrieveFiles(QString());
+        QTimer::singleShot(1000 , this , [&]() { retrieveCurrentTrack(); });
         emit connectedChanged();
     }
 }
@@ -152,6 +157,11 @@ void PlayerProxy::messageIncome(){
 
         emit currentTrackChanged();
         emit trackStatusChanged();
+    } else if(cmd == VolumeNotify::CMD){
+        VolumeNotify volumeNotify;
+        volumeNotify.deserialize(json);
+        mVolume = volumeNotify.volume();
+        emit volumeChanged();
     }
 }
 
@@ -180,6 +190,10 @@ int PlayerProxy::trackStatus(){
     return mTrackStatus;
 }
 
+int PlayerProxy::volume(){
+    return mVolume;
+}
+
 QString PlayerProxy::currentDirectory(){
     return mCurrentDirectory;
 }
@@ -190,6 +204,12 @@ void PlayerProxy::retrieveFiles(QString path){
     retrieveEntries.setPath(path);
 
     mSocket.write(QJsonDocument(retrieveEntries.serialize()).toJson());
+}
+
+void PlayerProxy::retrieveCurrentTrack(){
+    NamedCommand currentTrackCmd("getCurrentTrack");
+
+    mSocket.write(QJsonDocument(currentTrackCmd.serialize()).toJson());
 }
 
 void PlayerProxy::play(QString file){
@@ -210,6 +230,24 @@ void PlayerProxy::pause(){
     PauseCommand pauseCmd;
 
     mSocket.write(QJsonDocument(pauseCmd.serialize()).toJson());
+}
+
+void PlayerProxy::volumeUp(){
+    if(mVolume == 100)
+        return;
+
+    NamedCommand upCmd("volumeUp");
+
+    mSocket.write(QJsonDocument(upCmd.serialize()).toJson());
+}
+
+void PlayerProxy::volumeDown(){
+    if(mVolume == 0)
+        return;
+
+    NamedCommand downCmd("volumeDown");
+
+    mSocket.write(QJsonDocument(downCmd.serialize()).toJson());
 }
 
 QList<QPair<EntryInfo , int>> PlayerProxy::findNestedLevel(QList<EntryInfo>& entries){
