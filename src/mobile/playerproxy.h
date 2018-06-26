@@ -3,6 +3,9 @@
 
 #include <QQuickItem>
 #include <QTcpSocket>
+#include <QMap>
+#include <QPair>
+#include "entrylistresult.h"
 
 class PlayerProxy : public QQuickItem
 {
@@ -28,6 +31,7 @@ signals:
     void portChanged();
     void connectedChanged();
     void entriesChanged();
+    void errorOccured(QString msg);
 
 public slots:
 
@@ -39,6 +43,9 @@ private:
     void messageIncome();
 
 private:
+
+    QList<QPair<EntryInfo , int>> findNestedLevel(QList<EntryInfo>&);
+    int findNestedLevel(QString&);
 
     QVariantList mEntries;
     QTcpSocket mSocket;

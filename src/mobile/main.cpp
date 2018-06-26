@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include "serverfinder.h"
 #include "playerproxy.h"
+#include "networkutil.h"
 
 int main(int argc, char *argv[])
 {

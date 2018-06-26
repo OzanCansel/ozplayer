@@ -20,6 +20,7 @@ private slots:
 
 private:
 
+    QString bestSimilar(QString , QStringList);
     QHostAddress mAddr;
     QHostAddress mTcpServerAddr;
     int mPort;

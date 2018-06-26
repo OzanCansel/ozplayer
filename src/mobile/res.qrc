@@ -8,5 +8,7 @@
         <file>res/font/linux_libertine/LinLibertine_RZ.ttf</file>
         <file>res/img/note.png</file>
         <file>res/img/folder.png</file>
+        <file>res/img/play.png</file>
+        <file>res/img/back-arrow.png</file>
     </qresource>
 </RCC>

@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick.Controls 2.2
 import QtGraphicalEffects 1.0
 import mobile 1.0
 
@@ -6,10 +7,7 @@ Item {
 
     property PlayerProxy proxy : ({})
     id : mainItem
-//    Rectangle{
-//        anchors.fill: parent
-//        color : "#1D3262"
-//    }
+    property color headerColor : "#1D3262"
 
     LinearGradient{
         anchors.fill: parent
@@ -21,6 +19,14 @@ Item {
             GradientStop { position: 1.0; color: "black" }
         }
     }
+
+//    Connections{
+//        target:proxy
+//        onEntriesChanged : {
+//            serverList.currentIndex = -1;
+//            serverList.model = proxy.entries
+//        }
+//    }
 
     ListView {
         z : 2
@@ -42,7 +48,7 @@ Item {
                 anchors.rightMargin:  Responsive.h(35)
                 spacing : Responsive.h(30)
 
-                Image{
+                Image {
                     source: delegateItem.isFolder ? "/res/img/folder.png" : "/res/img/note.png"
                     width : Responsive.v(40)
                     height: Responsive.h(40)
@@ -62,11 +68,28 @@ Item {
 
             }
 
+            Button{
+                id : playButton
+                width : Responsive.v(50)
+                height: Responsive.h(50)
+                background: Image{
+                    source: "/res/img/play.png"
+                    width:playButton.width
+                    height:playButton.height
+                    fillMode: Image.PreserveAspectFit
+                    visible:serverList.currentIndex == index && !delegateItem.isFolder
+                }
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: Responsive.h(40)
+                z : 3
+            }
+
             MouseArea {
                 id : area
                 anchors.fill: parent
-                onClicked: {
-                    serverList.currentIndex = index
+                onClicked:  serverList.currentIndex = index
+                onDoubleClicked: {
                     if(delegateItem.isFolder)
                         proxy.retrieveFiles(delegateItem.folder)
                 }
@@ -75,7 +98,7 @@ Item {
 
             Rectangle{
                 anchors.fill:parent
-                color: serverList.currentIndex == index || area.containsMouse ?  "#0F1833" :  "transparent"
+                color: serverList.currentIndex == index ?  "#0F1833" :  "transparent"
                 opacity: 1
                 z : 1
             }

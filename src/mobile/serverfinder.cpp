@@ -4,6 +4,8 @@
 #include "playeripresult.h"
 #include "findplayeripcmd.h"
 #include <QHostAddress>
+#include <QNetworkAddressEntry>
+#include <QNetworkInterface>
 #include "networkutil.h"
 
 void ServerFinder::registerQmlType(){
@@ -23,7 +25,14 @@ void ServerFinder::search(){
         mSocket.open(QIODevice::ReadWrite);
 
     auto datagram = QJsonDocument(FindPlayerIpCmd().serialize()).toJson();
-    mSocket.writeDatagram(datagram , QHostAddress(QStringLiteral("239.255.43.21")) , 45454);
+    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+            QHostAddress broadcastAddress = entry.broadcast();
+            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
+                mSocket.writeDatagram(datagram , broadcastAddress , 45454);
+            }
+        }
+    }
 }
 
 void ServerFinder::searchTimedout(){

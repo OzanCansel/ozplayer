@@ -61,7 +61,7 @@ void PlayerService::messageIncome(){
         //Deserialize
         retrieveEntriesCmd.deserialize(json);
 
-        qDebug() << retrieveEntriesCmd.path();
+        qDebug() << retrieveEntriesCmd.path().toUtf8();
 
         QDir requestedDir(mBasePath);
         requestedDir.cd(retrieveEntriesCmd.path());
@@ -71,15 +71,15 @@ void PlayerService::messageIncome(){
 
         EntryListResult result;
         for(QFileInfo entry : entries){
-            if(!entry.isDir() && entry.suffix() != "MP3" &&
-                    entry.suffix() != "mp3" &&
-                        entry.suffix() != "flac" &&
-                            entry.suffix() != "FLAC")
+            if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("flac" , Qt::CaseInsensitive))
                 continue;
+
             EntryInfo entryInfo;
             entryInfo.setIsFolder(entry.isDir());
-            entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.filePath()));
+            entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.filePath().toUtf8()));
             result.entries().append(entryInfo);
+            qDebug() << "   " << entryInfo.path() << " added.";
         }
 
         socket->write(QJsonDocument(result.serialize()).toJson());

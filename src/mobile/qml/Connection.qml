@@ -16,6 +16,7 @@ Item {
     Column{
         width:parent.width
         height:parent.height
+        y : Responsive.v(100)
         spacing: Responsive.v(10)
 
         Item{
@@ -57,7 +58,10 @@ Item {
                 MouseArea{
                     id : area
                     anchors.fill: parent
-                    onClicked: serverList.currentIndex = index
+                    onClicked: {
+                        if(serverList.currentIndex != index)
+                            serverList.currentIndex = index
+                    }
                     onPressAndHold: connectToServer(delegateItem.serverIp , delegateItem.port)
                 }
             }
@@ -75,7 +79,7 @@ Item {
         font.pixelSize: Responsive.v(70)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom:parent.bottom
-        anchors.bottomMargin: Responsive.v(50)
+        anchors.bottomMargin: Responsive.v(110)
         onClicked: {
             connectToServer(serverList.currentItem.serverIp , serverList.currentItem.port)
         }
