@@ -15,6 +15,9 @@ class PlayerProxy : public QQuickItem
     Q_PROPERTY(int port READ port NOTIFY portChanged)
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
     Q_PROPERTY(QVariantList entries READ entries NOTIFY entriesChanged)
+    Q_PROPERTY(QString currentTrack READ currentTrack NOTIFY currentTrackChanged)
+    Q_PROPERTY(int trackStatus READ trackStatus NOTIFY trackStatusChanged)
+    Q_PROPERTY(QString currentDirectory READ currentDirectory NOTIFY currentDirectoryChanged)
 
 public:
 
@@ -24,6 +27,9 @@ public:
     int port();
     bool connected();
     QVariantList& entries();
+    QString currentTrack();
+    QString currentDirectory();
+    int trackStatus();
 
 signals:
 
@@ -31,12 +37,18 @@ signals:
     void portChanged();
     void connectedChanged();
     void entriesChanged();
+    void currentTrackChanged();
+    void trackStatusChanged();
+    void currentDirectoryChanged();
     void errorOccured(QString msg);
 
 public slots:
 
     void open(QString , int);
     void retrieveFiles(QString);
+    void play(QString);
+    void resume();
+    void pause();
 
 private:
 
@@ -51,6 +63,14 @@ private:
     QTcpSocket mSocket;
     QString mIp;
     int mPort;
+    QByteArray mBuffer;
+    int mBracketsCount { 0 };
+    int mLastIdx { 0 };
+    bool mIgnore { false };
+
+    QString mCurrentDirectory;
+    QString mCurrentTrack;
+    int mTrackStatus;
 
 };
 

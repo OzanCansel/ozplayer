@@ -9,6 +9,8 @@ Item {
     id : mainItem
     property color headerColor : "#1D3262"
 
+    property var discovered : []
+
     LinearGradient{
         anchors.fill: parent
         start: Qt.point(0, 0)
@@ -20,13 +22,24 @@ Item {
         }
     }
 
-//    Connections{
-//        target:proxy
-//        onEntriesChanged : {
-//            serverList.currentIndex = -1;
-//            serverList.model = proxy.entries
-//        }
-//    }
+    Connections{
+        target:proxy
+        onCurrentDirectoryChanged : {
+            if(discovered.indexOf(proxy.currentDirectory) >= 0)
+                return;
+
+            discovered.push(proxy.currentDirectory)
+        }
+    }
+
+    function up(){
+        if(proxy.entries[0].isUp){
+            proxy.retrieveFiles(proxy.entries[0].path)
+            return true
+        }
+
+        return false
+    }
 
     ListView {
         z : 2
@@ -34,13 +47,25 @@ Item {
         width: parent.width
         height: parent.height
         model: proxy.entries
+        populate: Transition {
+            id: _popuTrans
+            enabled: discovered.indexOf(proxy.currentDirectory) < 0
+            SequentialAnimation {
+                PropertyAction { property: "opacity"; value: 0.0 }
+                PauseAnimation { duration: 80*_popuTrans.ViewTransition.index }
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: 150; easing.type: Easing.InOutQuad }
+            }
+        }
         delegate : Item {
             id : delegateItem
             width:parent.width
             height: Responsive.v(150)
             property var fileName : proxy.entries[index].fileName
             property var isFolder : proxy.entries[index].isFolder
-            property var folder : proxy.entries[index].path
+            property var path : proxy.entries[index].path
+            property var isCurrent : delegateItem.path == proxy.currentTrack
+            property var containsCurrent : proxy.currentTrack.indexOf(delegateItem.path) >= 0
+
             Row {
                 z : 2
                 anchors.fill : parent
@@ -49,7 +74,14 @@ Item {
                 spacing : Responsive.h(30)
 
                 Image {
-                    source: delegateItem.isFolder ? "/res/img/folder.png" : "/res/img/note.png"
+                    source: {
+                        if(delegateItem.isFolder) return "/res/img/folder.png";
+                        if(delegateItem.isCurrent)
+                                return "/res/img/note-playing.png"
+
+                        return "/res/img/note.png"
+                    }
+
                     width : Responsive.v(40)
                     height: Responsive.h(40)
                     fillMode: Image.PreserveAspectFit
@@ -59,30 +91,59 @@ Item {
                 Text {
                     text : proxy.entries[index].fileName
                     width: delegateItem.width
-                    font.pixelSize: Responsive.v(43)
+                    font.pixelSize: delegateItem.isCurrent ? Responsive.v(46) : Responsive.v(43)
                     anchors.verticalCenter: parent.verticalCenter
-                    color: "white"
+                    color: delegateItem.isCurrent || (delegateItem.isFolder && delegateItem.containsCurrent && delegateItem.fileName != "Yukarı") ? "green" : "white"
+                    font.bold : delegateItem.isCurrent
                     font.family: FontCollection.connectionFontName
                     z:2
                 }
 
             }
 
-            Button{
-                id : playButton
-                width : Responsive.v(50)
-                height: Responsive.h(50)
-                background: Image{
-                    source: "/res/img/play.png"
-                    width:playButton.width
-                    height:playButton.height
-                    fillMode: Image.PreserveAspectFit
-                    visible:serverList.currentIndex == index && !delegateItem.isFolder
-                }
-                anchors.verticalCenter: parent.verticalCenter
+            Row {
                 anchors.right: parent.right
-                anchors.rightMargin: Responsive.h(40)
+                anchors.verticalCenter: parent.verticalCenter
                 z : 3
+
+                Button{
+                    id : playButton
+                    width : Responsive.v(130)
+                    height: Responsive.h(150)
+                    background: Image{
+                        source: "/res/img/play.png"
+                        width:Responsive.v(50)
+                        height:Responsive.v(50)
+                        fillMode: Image.PreserveAspectFit
+                        visible:serverList.currentIndex == index && !delegateItem.isFolder
+                        anchors.verticalCenter: playButton.verticalCenter
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: !delegateItem.isCurrent
+                    onClicked:  proxy.play(delegateItem.path)
+                }
+
+                Button{
+                    id : resumePauseButton
+                    width : Responsive.v(130)
+                    height: Responsive.h(150)
+                    background: Image{
+                        source: proxy.trackStatus == 1 ? "/res/img/play.png" : "/res/img/pause.png"
+                        width: Responsive.v(50)
+                        height:Responsive.v(50)
+                        fillMode: Image.PreserveAspectFit
+                        visible:serverList.currentIndex == index && !delegateItem.isFolder
+                        anchors.verticalCenter: resumePauseButton.verticalCenter
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: delegateItem.isCurrent
+                    onClicked: {
+                        if(proxy.trackStatus == 1)
+                            proxy.resume()
+                        else
+                            proxy.pause()
+                    }
+                }
             }
 
             MouseArea {
@@ -91,7 +152,10 @@ Item {
                 onClicked:  serverList.currentIndex = index
                 onDoubleClicked: {
                     if(delegateItem.isFolder)
-                        proxy.retrieveFiles(delegateItem.folder)
+                        proxy.retrieveFiles(delegateItem.path)
+                    else {
+                        proxy.play(delegateItem.path)
+                    }
                 }
                 hoverEnabled: true
             }

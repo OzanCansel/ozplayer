@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
 
     PlayerService service;
     service.setBasePath(QStandardPaths::standardLocations(QStandardPaths::MusicLocation).at(0));
+
+//    service.setBasePath("/home/arnes/playertest");
     service.init();
     qDebug() << "Player service is listening on " << service.port();
 

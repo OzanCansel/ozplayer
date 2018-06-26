@@ -20,9 +20,9 @@ ApplicationWindow {
 
         Button{
             id : backButton
-            height: Responsive.v(110)
-            width:Responsive.h(110)
-            x : Responsive.h(33)
+            height: Responsive.v(140)
+            width:Responsive.h(140)
+            x : Responsive.h(30)
             anchors.verticalCenter: parent.verticalCenter
             z : 2
             background: Item {
@@ -36,7 +36,15 @@ ApplicationWindow {
                     anchors.verticalCenter: parent.verticalCenter
                 }
             }
-            onClicked: stack.pop()
+            onClicked: {
+                if(stack.currentItem == playerControl){
+                    if(!playerControl.up())
+                        stack.pop()
+                }
+                else {
+                    stack.pop()
+                }
+            }
         }
 
 

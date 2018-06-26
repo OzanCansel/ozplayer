@@ -1,12 +1,18 @@
 #include "playerproxy.h"
-#include "networkutil.h"
-#include "retrieveentriescommand.h"
-#include "entrylistresult.h"
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QFileInfo>
 #include <QDir>
+#include "networkutil.h"
+#include "retrieveentriescommand.h"
+#include "entrylistresult.h"
+#include "playcommand.h"
+#include "pausecommand.h"
+#include "resumecommand.h"
+#include "currenttracknotify.h"
 
 void PlayerProxy::registerQmlType(){
     qmlRegisterType<PlayerProxy>("mobile" , 1 , 0 , "PlayerProxy");
@@ -35,7 +41,50 @@ void PlayerProxy::open(QString host, int port){
 }
 
 void PlayerProxy::messageIncome(){
-    auto json = QJsonDocument::fromJson(mSocket.readAll()).object();
+    mBuffer.append(mSocket.readAll());
+
+    bool found = false;
+
+    while(mBuffer.length() && mLastIdx < mBuffer.length()){
+        mBuffer.append(mSocket.readAll());
+        auto c = mBuffer.at(mLastIdx);
+        if(mIgnore){
+            mLastIdx++;
+            mIgnore = false;
+            continue;
+        }
+        if(c == '{')
+            mBracketsCount++;
+
+        if(mBracketsCount == 0 && mLastIdx == 0){
+            mBuffer.remove(0 , 1);
+            continue;
+        }
+
+        if(c == '\\')
+            mIgnore = true;
+
+        if(c == '}')
+            mBracketsCount--;
+
+        if(mBracketsCount == 0){
+            found = true;
+            mLastIdx++;
+            break;
+        }
+
+        mLastIdx++;
+    }
+
+    if(!found) {
+        return;
+    }
+
+    auto jsonStr = mBuffer.left(mLastIdx);
+
+    auto json = QJsonDocument::fromJson(jsonStr).object();
+    mBuffer.remove(0 , mLastIdx);
+    mLastIdx = 0;
 
     if(json["cmd"].isUndefined())
         return;
@@ -60,11 +109,15 @@ void PlayerProxy::messageIncome(){
         entry["isFolder"] = upDir.first.isFolder();
         entry["path"] = upDir.first.path();
         entry["fileName"] = "Yukarı";
+        entry["isUp"] = true;
 
         if(upDir.second >= 0){
             mEntries.append(entry);
             emit entriesChanged();
         }
+
+        mCurrentDirectory = entries.at(1).first.path();
+        emit currentDirectoryChanged();
 
         entries.removeFirst();
         entries.removeFirst();
@@ -84,10 +137,21 @@ void PlayerProxy::messageIncome(){
             entryVariant["isFolder"] = pair.first.isFolder();
             entryVariant["path"] = pair.first.path().toUtf8();
             entryVariant["fileName"] = QFileInfo(pair.first.path()).fileName().toUtf8();
+            entryVariant["isUp"] = false;
 
             mEntries.append(entryVariant);
-            emit entriesChanged();
         }
+
+        emit entriesChanged();
+    } else if(cmd == CurrentTrackNotify::CMD){
+        CurrentTrackNotify ctNotify;
+        ctNotify.deserialize(json);
+
+        mCurrentTrack = ctNotify.path();
+        mTrackStatus = (int)ctNotify.status();
+
+        emit currentTrackChanged();
+        emit trackStatusChanged();
     }
 }
 
@@ -108,6 +172,18 @@ bool PlayerProxy::connected(){
     return mSocket.isOpen();
 }
 
+QString PlayerProxy::currentTrack(){
+    return mCurrentTrack;
+}
+
+int PlayerProxy::trackStatus(){
+    return mTrackStatus;
+}
+
+QString PlayerProxy::currentDirectory(){
+    return mCurrentDirectory;
+}
+
 void PlayerProxy::retrieveFiles(QString path){
     RetrieveEntriesCommand retrieveEntries;
 
@@ -116,6 +192,25 @@ void PlayerProxy::retrieveFiles(QString path){
     mSocket.write(QJsonDocument(retrieveEntries.serialize()).toJson());
 }
 
+void PlayerProxy::play(QString file){
+    PlayCommand playCmd;
+
+    playCmd.setTrack(file);
+
+    mSocket.write(QJsonDocument(playCmd.serialize()).toJson());
+}
+
+void PlayerProxy::resume(){
+    ResumeCommand resumeCmd;
+
+    mSocket.write(QJsonDocument(resumeCmd.serialize()).toJson());
+}
+
+void PlayerProxy::pause(){
+    PauseCommand pauseCmd;
+
+    mSocket.write(QJsonDocument(pauseCmd.serialize()).toJson());
+}
 
 QList<QPair<EntryInfo , int>> PlayerProxy::findNestedLevel(QList<EntryInfo>& entries){
     QList<QPair<EntryInfo , int>> pairs;

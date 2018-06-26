@@ -8,6 +8,9 @@
 #include "entrylistresult.h"
 #include "entryinfo.h"
 #include "playcommand.h"
+#include "pausecommand.h"
+#include "resumecommand.h"
+#include "currenttracknotify.h"
 
 void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
@@ -86,5 +89,37 @@ void PlayerService::messageIncome(){
     } else if(cmd == PlayCommand::CMD){
         PlayCommand playCmd;
         playCmd.deserialize(json);
+        QDir baseDir(mBasePath);
+        mCurrentTrack = baseDir.filePath(playCmd.track());
+
+        mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
+        mPlayer.play();
+
+        CurrentTrackNotify notify;
+        notify.setStatus(TrackStatus::Playing);
+        notify.setPath(playCmd.track());
+        broadcast(notify.serialize());
+    } else if(cmd == ResumeCommand::CMD){
+        if(mPlayer.state() != QMediaPlayer::PlayingState){
+            mPlayer.play();
+            CurrentTrackNotify notify;
+            notify.setStatus(TrackStatus::Playing);
+            notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+            broadcast(notify.serialize());
+        }
+    } else if(cmd == PauseCommand::CMD){
+        if(mPlayer.state() != QMediaPlayer::PausedState){
+            mPlayer.pause();
+            CurrentTrackNotify notify;
+            notify.setStatus(TrackStatus::Paused);
+            notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+            broadcast(notify.serialize());
+        }
     }
+}
+
+void PlayerService::broadcast(QJsonObject&& json){
+    auto str = QJsonDocument(json).toJson();
+    for(auto socket : mClients)
+        socket->write(str);
 }

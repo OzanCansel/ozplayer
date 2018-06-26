@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QObject>
+#include <QMediaPlayer>
 
 class PlayerService : public QObject
 {
@@ -24,9 +25,13 @@ private slots:
 
 private:
 
+    void broadcast(QJsonObject&&);
+
     QTcpServer  mServer;
     QList<QTcpSocket*> mClients;
     QString mBasePath;
+    QMediaPlayer mPlayer;
+    QString mCurrentTrack;
 
 };
 

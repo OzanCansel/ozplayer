@@ -10,5 +10,9 @@
         <file>res/img/folder.png</file>
         <file>res/img/play.png</file>
         <file>res/img/back-arrow.png</file>
+        <file>res/img/note-playing.png</file>
+        <file>res/img/note-paused.png</file>
+        <file>res/img/pause.png</file>
+        <file>res/img/logout.png</file>
     </qresource>
 </RCC>

@@ -63,6 +63,7 @@ Item {
                             serverList.currentIndex = index
                     }
                     onPressAndHold: connectToServer(delegateItem.serverIp , delegateItem.port)
+                    onDoubleClicked: connectToServer(delegateItem.serverIp , delegateItem.port)
                 }
             }
             highlight: Rectangle{
