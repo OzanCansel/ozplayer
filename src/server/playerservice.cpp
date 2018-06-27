@@ -14,6 +14,7 @@
 
 void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
+    connect(&mPlayer , &QMediaPlayer::mediaStatusChanged , this , &PlayerService::mediaStatusChanged);
     mServer.listen();
 }
 
@@ -46,6 +47,43 @@ void PlayerService::setBasePath(QString path){
 
 QString PlayerService::basePath(){
     return mBasePath;
+}
+
+void PlayerService::mediaStatusChanged(QMediaPlayer::MediaStatus status){
+    if(status == QMediaPlayer::EndOfMedia){
+        auto idx = mPlaylist.indexOf(mCurrentTrack);
+        idx = mPlaylist.length() - 1 <= idx ? 0 : idx + 1;
+        PlayCommand playCmd;
+        playCmd.setTrack(QDir(mBasePath).relativeFilePath(mPlaylist.at(idx)));
+        play(playCmd);
+    }
+}
+
+void PlayerService::play(PlayCommand& playCmd){
+    QDir baseDir(mBasePath);
+    QDir trackDir(baseDir.filePath(playCmd.track()));
+    trackDir.cdUp();
+    if(trackDir.path() != mPlaylistBase){
+        mPlaylist.clear();
+        for(auto entry : trackDir.entryInfoList(QStringList() << "*" , QDir::Files)){
+            if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("flac" , Qt::CaseInsensitive))
+                continue;
+            mPlaylist.append(entry.filePath());
+        }
+        mPlaylistBase = trackDir.path();
+    }
+    mCurrentTrack = baseDir.filePath(playCmd.track());
+
+    mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
+    mPlayer.play();
+
+    mTrackStatus = TrackStatus::Playing;
+
+    CurrentTrackNotify notify;
+    notify.setStatus(mTrackStatus);
+    notify.setPath(playCmd.track());
+    broadcast(notify.serialize());
 }
 
 void PlayerService::messageIncome(){
@@ -89,18 +127,7 @@ void PlayerService::messageIncome(){
     } else if(cmd == PlayCommand::CMD){
         PlayCommand playCmd;
         playCmd.deserialize(json);
-        QDir baseDir(mBasePath);
-        mCurrentTrack = baseDir.filePath(playCmd.track());
-
-        mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
-        mPlayer.play();
-
-        mTrackStatus = TrackStatus::Playing;
-
-        CurrentTrackNotify notify;
-        notify.setStatus(mTrackStatus);
-        notify.setPath(playCmd.track());
-        broadcast(notify.serialize());
+        play(playCmd);
     } else if(cmd == ResumeCommand::CMD){
         if(mPlayer.state() != QMediaPlayer::PlayingState){
             mPlayer.play();

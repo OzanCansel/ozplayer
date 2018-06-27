@@ -137,6 +137,7 @@ Item {
                     }
                     anchors.verticalCenter: parent.verticalCenter
                     visible: delegateItem.isCurrent
+                    enabled: serverList.currentIndex == index
                     onClicked: {
                         if(proxy.trackStatus == 1)
                             proxy.resume()
@@ -198,25 +199,7 @@ Item {
                 width: volumeSlider.availableWidth
                 height: implicitHeight
                 radius: Responsive.v(5)
-//                color: "#bdbebf"
                 color : "#555555"
-
-//                Rectangle{
-//                    height: parent.height
-//                    width: volumeSlider.visualPosition * parent.width
-//                    color : ""
-//                }
-
-//                LinearGradient{
-//                    height : parent.height
-//                    width : volumeSlider.visualPosition * parent.width
-//                    start: Qt.point(0, 0)
-//                    end: Qt.point(width, 0)
-//                    gradient: Gradient {
-//                        GradientStop { position: 0; color: "black" }
-//                        GradientStop{ position: 1; color : "#2ec56c"}
-//                    }
-//                }
             }
 
             handle: Rectangle {
@@ -224,11 +207,8 @@ Item {
                 y: volumeSlider.topPadding + volumeSlider.availableHeight / 2 - height / 2
                 implicitWidth: Responsive.v(50)
                 implicitHeight: Responsive.v(50)
-//                color: volumeSlider.pressed ? "#f0f0f0" : "#f0f0f0"
                 color : "#ffffff"
                 radius: Responsive.v(25)
-//                border.width: Responsive.v(5)
-//                border.color: "black"
             }
         }
 

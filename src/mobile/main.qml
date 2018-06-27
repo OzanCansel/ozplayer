@@ -13,6 +13,7 @@ ApplicationWindow {
 //    visibility: ApplicationWindow.FullScreen
     title: qsTr("Oz Player")
 
+
     header: Item {
         height : Responsive.v(140)
         width: app.width
@@ -73,6 +74,10 @@ ApplicationWindow {
         onConnectedChanged: {
             if(connected)
                 stack.push(playerControl)
+            else if(stack.depth > 1){
+                while(stack.depth == 1)
+                    stack.pop()
+            }
         }
     }
 

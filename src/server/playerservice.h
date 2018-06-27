@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QMediaPlayer>
 #include "currenttracknotify.h"
+#include "playcommand.h"
 
 class PlayerService : public QObject
 {
@@ -23,6 +24,8 @@ private slots:
 
     void messageIncome();
     void clientDisconnected();
+    void mediaStatusChanged(QMediaPlayer::MediaStatus);
+    void play(PlayCommand&);
 
 private:
 
@@ -34,6 +37,8 @@ private:
     QMediaPlayer mPlayer;
     QString mCurrentTrack;
     TrackStatus mTrackStatus;
+    QStringList mPlaylist;
+    QString mPlaylistBase;
 
 };
 

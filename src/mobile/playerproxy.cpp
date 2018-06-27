@@ -141,10 +141,32 @@ void PlayerProxy::messageIncome(){
             QVariantMap entryVariant;
             entryVariant["isFolder"] = pair.first.isFolder();
             entryVariant["path"] = pair.first.path().toUtf8();
-            entryVariant["fileName"] = QFileInfo(pair.first.path()).fileName().toUtf8();
+            auto fileName = QFileInfo(pair.first.path()).fileName().trimmed();
+
+            QMap<int , int> valueScores;
+            for(auto innerPair : entries){
+                if(pair.first.path() == innerPair.first.path() ||
+                        pair.first.isFolder())
+                    continue;
+                auto checkingFileName = QFileInfo(innerPair.first.path()).fileName().trimmed();
+                auto score = similarityScore(fileName , checkingFileName);
+                valueScores[score]++;
+            }
+
+            auto leftTrimLength = 0;
+            for(auto key : valueScores.keys()){
+                if(valueScores[key] > valueScores[leftTrimLength])
+                    leftTrimLength = key;
+            }
+
+
+            if(leftTrimLength < 6)
+                leftTrimLength = 0;
+            entryVariant["fileName"] = fileName.right(fileName.length() - leftTrimLength);
             entryVariant["isUp"] = false;
 
             mEntries.append(entryVariant);
+            valueScores.clear();
         }
 
         emit entriesChanged();
@@ -276,4 +298,20 @@ int PlayerProxy::findNestedLevel(QString &path){
     }
 
     return level;
+}
+
+
+int PlayerProxy::similarityScore(QString ip, QString str){
+    auto score = 0;
+
+    for(auto i = 0; i < ip.length(); ++i){
+        if(str.length() == i)
+            break;
+        if(ip.at(i) == str.at(i))
+            score++;
+        else
+            break;
+    }
+
+    return score;
 }

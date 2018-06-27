@@ -32,6 +32,7 @@ public:
     QString currentDirectory();
     int trackStatus();
     int volume();
+    int similarityScore(QString , QString);
 
 signals:
 
