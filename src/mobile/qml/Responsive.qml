@@ -6,8 +6,8 @@ Item    {
 
     property real viewHeight : 1920
     property real viewWidth : 1080
-    property real appHeight : 1000
-    property real appWidth : 562
+    property real appHeight : Screen.height < Screen.width ? Screen.width : Screen.height
+    property real appWidth : Screen.width > Screen.height ? Screen.height : Screen.width
     readonly property real vFactor : appHeight / viewHeight
     readonly property real hFactor : appWidth / viewWidth
 

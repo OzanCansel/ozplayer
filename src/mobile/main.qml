@@ -8,9 +8,9 @@ import "qml"
 ApplicationWindow {
     id: app
     visible: true
-    width: 562
-    height: 1000
-//    visibility: ApplicationWindow.FullScreen
+//    width: 562
+//    height: 1000
+    visibility: ApplicationWindow.FullScreen
     title: qsTr("Oz Player")
 
 
