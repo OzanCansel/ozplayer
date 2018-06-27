@@ -103,6 +103,8 @@ QString LocatingService::bestSimilar(QString ip, QStringList strs){
                 break;
             if(ip.at(i) == str.at(i))
                 score++;
+            else
+                break;
         }
         if(score > lastScore)
             returned = str;

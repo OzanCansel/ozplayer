@@ -50,7 +50,7 @@ ApplicationWindow {
 
         Text {
             z : 2
-            text: qsTr("OzPlayer")
+            text: stack.currentItem.headerText ? stack.currentItem.headerText : qsTr("OzPlayer")
             font.pixelSize: Responsive.v(30)
             font.family: FontCollection.mainFontName
             color : "white"

@@ -33,6 +33,27 @@ Item {
             }
         }
 
+        Item{
+            width:parent.width
+            height: Responsive.v(900)
+            visible:serverList.count == 0
+
+            Text{
+                text : "Cihaz bulunamadı."
+                font.pixelSize: Responsive.v(110)
+                color : "white"
+                font.family: FontCollection.connectionFontName
+                horizontalAlignment: Text.AlignHCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.centerIn: parent
+            }
+
+            MouseArea{
+                anchors.fill:parent
+                onClicked: Qt.openUrlExternally("https://www.google.com.tr")
+            }
+        }
+
         ListView {
             id : serverList
             width: parent.width
@@ -76,13 +97,29 @@ Item {
         id : connectButton
         width: Responsive.h(500)
         height: Responsive.v(200)
-        text: "Baglan"
+        text: "Bağlan"
         font.pixelSize: Responsive.v(70)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom:parent.bottom
-        anchors.bottomMargin: Responsive.v(110)
+        anchors.bottomMargin: Responsive.v(120)
+        visible: serverList.count > 0
         onClicked: {
             connectToServer(serverList.currentItem.serverIp , serverList.currentItem.port)
+        }
+    }
+
+    TextButton{
+        id : refreshButton
+        width: Responsive.h(500)
+        height: Responsive.v(200)
+        text: "Tekrar Dene"
+        font.pixelSize: Responsive.v(70)
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottomMargin: Responsive.v(120)
+        anchors.bottom:parent.bottom
+        visible: serverList.count == 0
+        onClicked: {
+            finder.search()
         }
     }
 }
