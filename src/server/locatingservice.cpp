@@ -10,11 +10,10 @@
 #include <QRegularExpressionMatch>
 
 LocatingService::LocatingService(QHostAddress addr , int port ,
-                                 QHostAddress tcpServerAddr , int tcpServerPort ,
+                                 int tcpServerPort ,
                                  QString pcName)
     :
       mAddr(addr) ,
-      mTcpServerAddr(tcpServerAddr) ,
       mPort(port) ,
       mTcpServerPort(tcpServerPort) ,
       mPcName(pcName)

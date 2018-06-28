@@ -11,7 +11,7 @@ class LocatingService : public QObject
 
 public:
 
-    LocatingService(QHostAddress , int , QHostAddress , int , QString);
+    LocatingService(QHostAddress , int , int , QString);
     void init();
 
 private slots:
@@ -22,7 +22,6 @@ private:
 
     QString bestSimilar(QString , QStringList);
     QHostAddress mAddr;
-    QHostAddress mTcpServerAddr;
     int mPort;
     int mTcpServerPort;
     QUdpSocket mSocket;

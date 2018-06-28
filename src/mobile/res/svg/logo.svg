@@ -58,7 +58,7 @@
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1" />
   <metadata
@@ -79,9 +79,9 @@
      id="layer1">
     <g
        id="g4550"
-       inkscape:export-filename="C:\Users\ozanc\Documents\repo\ozplayer\src\mobile\res\logo\logo-hdpi.png"
-       inkscape:export-xdpi="30.370001"
-       inkscape:export-ydpi="30.370001">
+       inkscape:export-filename="C:\Users\ozanc\Documents\repo\ozplayer\deployment\windows\installerTemplate\config\app-logo-256.png"
+       inkscape:export-xdpi="108"
+       inkscape:export-ydpi="108">
       <g
          clip-path="url(#clipPath4541)"
          transform="translate(1.2113876,-2.6468296)"

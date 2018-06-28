@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Installer>
+    
+<Name>OzPlayer Service</Name>
+    
+<Version>1.0.0</Version>
+    
+<Title>OzPlayer Service Installation</Title>
+    
+<Publisher>OzPlayer</Publisher>
+	 
+<ProductUrl>http://www.kodlio.com</ProductUrl>
+	 
+<MaintenanceToolName>OzPlayerServiceMaintenanceTool</MaintenanceToolName>
+    
+<StartMenuDir>OzPlayer Service</StartMenuDir>
+    
+<TargetDir>C:\OzPlayerService</TargetDir>
+	
+<ControlScript>controlscript.js</ControlScript>
+	
+<InstallerApplicationIcon>app.ico</InstallerApplicationIcon>
+	
+<InstallerWindowIcon>app.ico</InstallerWindowIcon>
+	
+<Logo>app-logo.png</Logo>
+	
+<WizardStyle>Modern</WizardStyle>
+
+</Installer>
