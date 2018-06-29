@@ -1,6 +1,17 @@
 TEMPLATE = subdirs
 
+android: {
 SUBDIRS += \
     ozlib \
-    server \
     mobile
+}
+
+win32: {
+SUBDIRS += \
+    ozlib \
+    mobile \
+    configurator \
+    server
+}
+
+

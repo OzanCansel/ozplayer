@@ -8,16 +8,15 @@ import "qml"
 ApplicationWindow {
     id: app
     visible: true
-//    width: 562
-//    height: 1000
-    visibility: ApplicationWindow.FullScreen
+    width: visibility == ApplicationWindow.Windowed ? Screen.height * 0.4 : Screen.width
+    height: visibility == ApplicationWindow.Windowed ? Screen.height * 0.8 : Screen.height
+    visibility: !osInfo.isWindows() ? ApplicationWindow.FullScreen :  (fullscreenButton.checked ? ApplicationWindow.FullScreen : ApplicationWindow.Windowed)
     title: qsTr("Oz Player")
-
 
     header: Item {
         height : Responsive.v(140)
         width: app.width
-        visible: stack.depth > 1
+        visible: stack.depth
 
         Button{
             id : backButton
@@ -26,6 +25,7 @@ ApplicationWindow {
             x : Responsive.h(30)
             anchors.verticalCenter: parent.verticalCenter
             z : 2
+            visible: stack.depth > 1
             background: Item {
                 Image
                 {
@@ -57,11 +57,113 @@ ApplicationWindow {
             color : "white"
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
+            visible: stack.depth > 1
         }
 
         Rectangle{
             anchors.fill:parent
             color: stack.currentItem.headerColor ? stack.currentItem.headerColor : "black"
+        }
+
+        Item {
+            z : 5
+            anchors.right: parent.right
+            y:Responsive.v(10)
+            width: Responsive.h(350)
+            height: Responsive.v(120)
+
+            Item {
+                anchors.right: shutdownButtonItem.left
+                width: Responsive.h(120)
+                height: Responsive.v(100)
+                visible: osInfo.isWindows()
+                enabled: osInfo.isWindows()
+
+                Item {
+
+                    property bool checked : false
+                    id : fullscreenButton
+                    anchors.right: parent.right
+                    anchors.rightMargin: Responsive.h(16)
+                    anchors.top: parent.top
+                    anchors.topMargin: Responsive.v(10)
+                    width: Responsive.v(100)
+                    height: Responsive.h(100)
+                    z : 2
+
+                    Image{
+                        source : fullscreenButton.checked ? "/res/img/windowed.png" : "res/img/fullscreen.png"
+                        height: Responsive.v(70)
+                        width: Responsive.h(70)
+                        fillMode: Image.PreserveAspectFit
+                        y : Responsive.v(10)
+                    }
+
+                    opacity: shutdownButtonArea.containsMouse || fullScreenButtonArea.containsMouse ? 1 : 0
+                    Behavior on opacity{
+                        SequentialAnimation {
+
+                            PauseAnimation {
+                                duration: fullscreenButton.opacity == 1 ? 1500 : 0
+                            }
+                            NumberAnimation{    }
+                        }
+                    }
+
+                    MouseArea{
+                        id : fullScreenButtonArea
+                        anchors.fill:parent
+                        hoverEnabled: true
+                        onClicked: fullscreenButton.checked = !fullscreenButton.checked
+                    }
+                }
+            }
+
+            Item{
+                id : shutdownButtonItem
+                z : 5
+                anchors.right: parent.right
+                width: Responsive.h(120)
+                height: Responsive.v(100)
+
+                Item {
+
+                    id : shutdownButton
+                    anchors.right: parent.right
+                    anchors.rightMargin: Responsive.h(5)
+                    anchors.top: parent.top
+                    anchors.topMargin: Responsive.v(10)
+                    width: Responsive.v(100)
+                    height: Responsive.h(100)
+                    z : 2
+
+                    Image {
+                        source : "res/img/logout.png"
+                        height: Responsive.v(70)
+                        width: Responsive.h(70)
+                        fillMode: Image.PreserveAspectFit
+                        y : Responsive.v(10)
+                    }
+                    opacity: !osInfo.isWindows() || fullScreenButtonArea.containsMouse || shutdownButtonArea.containsMouse ? 1 : 0
+
+                    Behavior on opacity{
+                        SequentialAnimation {
+
+                            PauseAnimation {
+                                duration: shutdownButton.opacity == 1 ? 1500 : 0
+                            }
+                            NumberAnimation{    }
+                        }
+                    }
+
+                    MouseArea{
+                        id : shutdownButtonArea
+                        anchors.fill:parent
+                        hoverEnabled: true
+                        onClicked: Qt.quit()
+                    }
+                }
+            }
         }
     }
 

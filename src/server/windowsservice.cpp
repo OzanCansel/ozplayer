@@ -2,13 +2,15 @@
 #include <QHostInfo>
 #include <QCoreApplication>
 #include <QStandardPaths>
+#include <QSettings>
+#include <QDir>
 
 WindowsService::WindowsService(int argc, char **argv)
     :
       QtService<QCoreApplication>(argc , argv, "ozplayer")
 {
     setStartupType(QtServiceController::AutoStartup);
-    setServiceDescription("A Qt service with user interface.");
+    setServiceDescription("OzPlayer Service.");
     setServiceFlags(QtServiceBase::CanBeSuspended);
 }
 
@@ -16,7 +18,9 @@ WindowsService::~WindowsService() { }
 
 void WindowsService::start(){
     mPlayer = QSharedPointer<PlayerService>::create();
-    mPlayer->setBasePath(QStandardPaths::standardLocations(QStandardPaths::MusicLocation).at(0));
+    QSettings settings(QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat);
+    QString path = settings.value("baseDir" , QVariant("C:/Users")).toString();
+    mPlayer->setBasePath(path);
 
     mPlayer->init();
 

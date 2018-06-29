@@ -103,6 +103,9 @@ void PlayerProxy::messageIncome(){
 
         mEntries.clear();
 
+        if(entriesResult.entries().length() < 2)
+            return;
+
         auto entries = findNestedLevel(entriesResult.entries());
         qSort(entries.begin() , entries.end() ,
               [](const QPair<EntryInfo , int>& first , const QPair<EntryInfo , int>& second){

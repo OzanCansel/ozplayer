@@ -38,7 +38,8 @@ SOURCES += \
     retrieveentriescommand.cpp \
     entryinfo.cpp \
     currenttracknotify.cpp \
-    volumenotify.cpp
+    volumenotify.cpp \
+    osinfo.cpp
 
 HEADERS += \
         lib.h \
@@ -56,7 +57,8 @@ HEADERS += \
     retrieveentriescommand.h \
     entryinfo.h \
     currenttracknotify.h \
-    volumenotify.h
+    volumenotify.h \
+    osinfo.h
 
 unix {
     target.path = /usr/lib

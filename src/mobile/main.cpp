@@ -1,8 +1,10 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include "serverfinder.h"
 #include "playerproxy.h"
 #include "networkutil.h"
+#include "osinfo.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,10 +15,13 @@ int main(int argc, char *argv[])
 
     ServerFinder::registerQmlType();
     PlayerProxy::registerQmlType();
+    OsInfo osInfo;
 
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
+    engine.rootContext()->setContextProperty("osInfo" , &osInfo);
+
+    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
 

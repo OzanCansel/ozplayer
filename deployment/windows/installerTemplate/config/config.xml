@@ -2,21 +2,21 @@
 
 <Installer>
     
-<Name>OzPlayer Service</Name>
+<Name>OzPlayer</Name>
     
 <Version>1.0.0</Version>
     
-<Title>OzPlayer Service Installation</Title>
+<Title>OzPlayer Installation</Title>
     
 <Publisher>OzPlayer</Publisher>
 	 
 <ProductUrl>http://www.kodlio.com</ProductUrl>
 	 
-<MaintenanceToolName>OzPlayerServiceMaintenanceTool</MaintenanceToolName>
+<MaintenanceToolName>OzPlayerMaintenanceTool</MaintenanceToolName>
     
-<StartMenuDir>OzPlayer Service</StartMenuDir>
+<StartMenuDir>OzPlayer</StartMenuDir>
     
-<TargetDir>C:\OzPlayerService</TargetDir>
+<TargetDir>C:\OzPlayer</TargetDir>
 	
 <ControlScript>controlscript.js</ControlScript>
 	

@@ -14,5 +14,7 @@
         <file>res/img/note-paused.png</file>
         <file>res/img/pause.png</file>
         <file>res/img/logout.png</file>
+        <file>res/img/fullscreen.png</file>
+        <file>res/img/windowed.png</file>
     </qresource>
 </RCC>

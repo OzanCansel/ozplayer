@@ -6,6 +6,7 @@ Item {
 
     property ServerFinder finder : ({})
     property PlayerProxy proxy : ({})
+    property color headerColor : "black"
 
     id: searchServer
 
@@ -17,11 +18,11 @@ Item {
         width:parent.width
         height:parent.height
         y : Responsive.v(100)
-        spacing: Responsive.v(10)
+        spacing: Responsive.v(50)
 
         Item{
             anchors.horizontalCenter: parent.horizontalCenter
-            height: Responsive.v(330)
+            height: Responsive.v(200)
             width: parent.width
             Text {
                 id: name
@@ -52,6 +53,11 @@ Item {
                 anchors.fill:parent
                 onClicked: Qt.openUrlExternally("https://www.google.com.tr")
             }
+        }
+
+        Item{
+            width: parent.width
+            height: Responsive.v(40)
         }
 
         ListView {

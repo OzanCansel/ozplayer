@@ -41,7 +41,7 @@ echo "ozlib is compiling..."
 	qmake "$SRC_DIR/ozlib/ozlib.pro" -spec win32-g++
 	#Run make_all calistiriliyor
 	$MAKE_COMMAND qmake_all
-	#Compile proj
+	#Compile project
 	$MAKE_COMMAND -f Makefile.Release
 	cd ..
 echo "ozlib compiled."
@@ -50,24 +50,40 @@ echo "ozlib compiled."
 echo "server is compiling..."
 	mkdir server
 	cd server
-	#qmake kullanilarak makefile uretiliyor
+	#Generate makefile via qmake
 	qmake "$SRC_DIR/server/server.pro" -spec win32-g++
-	#qmake make_all calistiriliyor
+	#run qmake make_all
 	$MAKE_COMMAND qmake_all
-	#Proje derleniyor
+	#Compile project
 	$MAKE_COMMAND -f Makefile.Release
 	cd ..
 echo "server is compiled."
 
-echo "Deploying server binary..."
+#configurator compiling
+echo "configurator is compiling..."
+	mkdir configurator
+	cd configurator
+	#Generator makefile via qmake
+	qmake "$SRC_DIR/configurator/configurator.pro" -spec win32-g++
+	#Compile project
+	$MAKE_COMMAND qmake_all
+	#Compile project
+	$MAKE_COMMAND -f Makefile.Release
+echo "configurator is compiled."
+
+echo "Deploying executables and libraries..."
 #deploy klasorune giriliyor
 cd "$DEPLOY_DIR"
 #Uygulama deploy islemi baslatiliyor
 cp "$BUILD_DIR/server/release/server.exe" "$DEPLOY_DIR/server.exe"
 cp "$BUILD_DIR/ozlib/release/ozlib.dll" "$DEPLOY_DIR/ozlib.dll"
-windeployqt.exe "$DEPLOY_DIR\\server.exe" --qmldir="$SRC_DIR" --release
-windeployqt.exe "$DEPLOY_DIR\\ozlib.dll" --release
+cp "$BUILD_DIR/configurator/release/configurator.exe" "$DEPLOY_DIR/configurator.exe"
+windeployqt.exe "$DEPLOY_DIR\\server.exe" --release
 echo "Deployed server as server.exe."
+windeployqt.exe "$DEPLOY_DIR\\ozlib.dll" --release
+echo "Deployed ozlib as ozlib.dll"
+windeployqt.exe "$DEPLOY_DIR\\configurator.exe" --release
+echo "Deployed configurator as configurator.exe"
 
 echo "Copying files..."
 cp -r "$SCRIPTDIR/installerTemplate/"* "$INSTALLER_DIR"

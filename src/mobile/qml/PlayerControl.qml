@@ -33,6 +33,8 @@ Item {
     }
 
     function up(){
+        if(proxy.entries.length < 2)
+            return false
         if(proxy.entries[0].isUp){
             proxy.retrieveFiles(proxy.entries[0].path)
             return true
@@ -47,6 +49,7 @@ Item {
         width: parent.width
         height: parent.height
         model: proxy.entries
+
         populate: Transition {
             id: _popuTrans
             enabled: discovered.indexOf(proxy.currentDirectory) < 0
@@ -56,6 +59,7 @@ Item {
                 NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: 150; easing.type: Easing.InOutQuad }
             }
         }
+
         delegate : Item {
             id : delegateItem
             width:parent.width
