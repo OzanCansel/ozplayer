@@ -41,3 +41,19 @@ win32:RC_ICONS += app.ico
 RESOURCES += \
     res.qrc
 
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../third_party/qtservice/lib/ -lQtSolutions_Service-head
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../third_party/qtservice/lib/ -lQtSolutions_Service-headd
+
+INCLUDEPATH += $$PWD/../third_party/qtservice/include
+DEPENDPATH += $$PWD/../third_party/qtservice/include
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../third_party/qtservice/lib/libQtSolutions_Service-head.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../third_party/qtservice/lib/libQtSolutions_Service-headd.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../third_party/qtservice/lib/QtSolutions_Service-head.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../third_party/qtservice/lib/QtSolutions_Service-headd.lib
+
+unix:!macx: LIBS += -L$$PWD/../third_party/qtservice/lib/ -lQtSolutions_Service-head
+
+INCLUDEPATH += $$PWD/../third_party/qtservice/include
+DEPENDPATH += $$PWD/../third_party/qtservice/include

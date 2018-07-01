@@ -1,0 +1,18 @@
+Kodlio ("yazılım olarak anılacaktır") yazılımını indirerek siz ("kullanıcı olarak anılacaktır") Roboskop tarafından verilen Son Kullanıcı Lisans Sözleşmesini (EULA) kabul etmiş sayılırsınız.
+
+1. Kullanıcının aşağıdaki eylemleri yapması yasaktır.
+
+(1) Yazılımı kısmi veya bütün olarak satmak, dağıtmak veya yüklemek.
+(2) Yazılımı kısmi veya bütün olarak değiştirmek, modifiye etmek, üzerinde tersine mühendislik yapmak, geriye derlemek veya parçalarına ayırmak.
+(3) Yazılımı kısmi veya bütün olarak kiralamak veya alt lisanslamak.
+(5) Herhangi bir ülkedeki ilgili resmi mercinin gerekli onaylarını almadan Yazılımı kısmi veya bütün olarak, doğrudan veya dolaylı olarak ihraç etmek.
+3. Yazılımla ilgili herhangi bir hak, ünvan ve fayda Roboskop'a veya lisansörlerine aittir veya verilmiştir.
+
+4. Kullanıcı, yazılımın Kullanıcıya herhangi bir tipte garanti olmadan, açık veya zımni "olduğu gibi" bazında aşağıdakiler dahil fakat bunlarla sınırlı kalmaksızın verildiğini onaylar ve anlar:
+
+(1) Ticarilik ve/veya Kullanıcının belirli bir amacı için uygunluk için garantiler.
+(2) Yazılımdaki sorunlar, hatalar, arızalar veya kusurlar için garanti veya
+(3) Fikri mülkiyet hakları dahil olmak ancak bununla sınırlı kalmayarak, herhangi bir üçüncü şahsın haklarının veya çıkarlarının ihlal edilmemesi hakkı için garantiler.
+5. Roboskop hiçbir durumda, yazılımından veya bunun kullanılmasından kaynaklanan, Kullanıcının ve üçüncü şahısların maruz kaldığı herhangi bir zarardan (kâr kaybı, iş kesintisi, dolaylı iş bilgilerinin kaybı ve benzeri dahil olmak ancak bunlarla sınırlı kalmamak üzere, genel, özel, doğrudan, dolaylı, arızi kayıp ve zararlardan) sorumlu tutulamaz.
+
+6. Kullanıcı bu Anlaşmadaki herhangi bir şart ve koşula uymazsa, Roboskop, Kullanıcının bu tip bir ihlalinden veya bununla bağlantı olarak ortaya çıkan, herhangi bir kayıp ve zarar (iş kârı, iş kesintisi, iş bilgilerinin vb. kaybı dahil olmak üzere) veya Roboskop'un maruz kaldığı kâr kaybı için bu anlaşmayı feshedebilir ve herhangi bir kayıp ve zarar hakkını arayabilir. Böyle bir durumda Kullanıcı, ister bir bütün ister kısmi olarak olsun, yazılımı ve bunun tüm kopyalarını derhal imha edecek veya Roboskop'a iade edecektir.

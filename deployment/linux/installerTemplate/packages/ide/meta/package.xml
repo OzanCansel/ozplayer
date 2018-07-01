@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Editor</DisplayName>
+    <Description>Kodlio kodlama editörü.</Description>
+    <Version>0.1.0-1</Version>
+    <ReleaseDate>2017-05-15</ReleaseDate>
+    <Licenses>
+        <License name="Kodlio Lisans Sözleşmesi" file="license.txt" />
+    </Licenses>
+    <Default>true</Default>
+	<Script>installscript.qs</Script>
+</Package>

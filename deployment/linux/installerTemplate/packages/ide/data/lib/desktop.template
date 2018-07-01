@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Kodlio
+GenericName=Kodlio
+Comment=Ücretsiz robotik programlama editörü
+Exec=<BINARY_LOCATION>
+Icon=<ICON_NAME>
+Terminal=false
+Categories=Development;IDE;Electronics;
+MimeType=text/x-kodlio;
+Keywords=embedded electronics;electronics;avr;microcontroller;
+StartupWMClass=processing-app-Base

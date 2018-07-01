@@ -10,7 +10,7 @@ ApplicationWindow {
     visible: true
     width: visibility == ApplicationWindow.Windowed ? Screen.height * 0.4 : Screen.width
     height: visibility == ApplicationWindow.Windowed ? Screen.height * 0.8 : Screen.height
-    visibility: !osInfo.isWindows() ? ApplicationWindow.FullScreen :  (fullscreenButton.checked ? ApplicationWindow.FullScreen : ApplicationWindow.Windowed)
+    visibility: osInfo.isAndroid() ? ApplicationWindow.FullScreen :  (fullscreenButton.checked ? ApplicationWindow.FullScreen : ApplicationWindow.Windowed)
     title: qsTr("Oz Player")
 
     header: Item {
@@ -76,8 +76,8 @@ ApplicationWindow {
                 anchors.right: shutdownButtonItem.left
                 width: Responsive.h(120)
                 height: Responsive.v(100)
-                visible: osInfo.isWindows()
-                enabled: osInfo.isWindows()
+                visible: osInfo.isWindows() || osInfo.isUnix()
+                enabled: osInfo.isWindows() || osInfo.isUnix()
 
                 Item {
 
@@ -119,7 +119,7 @@ ApplicationWindow {
                 }
             }
 
-            Item{
+            Item {
                 id : shutdownButtonItem
                 z : 5
                 anchors.right: parent.right
@@ -144,15 +144,15 @@ ApplicationWindow {
                         fillMode: Image.PreserveAspectFit
                         y : Responsive.v(10)
                     }
-                    opacity: !osInfo.isWindows() || fullScreenButtonArea.containsMouse || shutdownButtonArea.containsMouse ? 1 : 0
+                    opacity: (!osInfo.isWindows() && !osInfo.isUnix()) || fullScreenButtonArea.containsMouse || shutdownButtonArea.containsMouse ? 1 : 0
 
-                    Behavior on opacity{
+                    Behavior on opacity {
                         SequentialAnimation {
 
                             PauseAnimation {
                                 duration: shutdownButton.opacity == 1 ? 1500 : 0
                             }
-                            NumberAnimation{    }
+                            NumberAnimation {    }
                         }
                     }
 

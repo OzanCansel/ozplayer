@@ -6,10 +6,13 @@
 #include "locatingservice.h"
 #include <QSharedPointer>
 
+#define STATUS_COMMAND 10
+
 class WindowsService : public QtService<QCoreApplication>
 {
 
 public:
+
     WindowsService(int argc, char **argv);
     ~WindowsService();
 

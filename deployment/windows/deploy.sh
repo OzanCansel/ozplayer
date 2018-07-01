@@ -23,9 +23,9 @@ INSTALLER_DIST_DIR=$(realpath -sm "$SCRIPTDIR/../../dist/windows/$VERSION")
 
 export PATH=$KITPATH/bin:$QTPATH/Tools/QtInstallerFramework/2.0/bin:$QTPATH/Tools/mingw530_32/bin:$PATH
 
-#temp klasoru temizleniyor 
+#clear temp
 rm -rf temp
-#temp klasoru olusturuluyor
+#mkdir temp and deployment folders
 mkdir -p "$TEMP_DIR"
 mkdir -p "$BUILD_DIR" 
 mkdir -p "$DEPLOY_DIR"
@@ -39,7 +39,7 @@ echo "ozlib is compiling..."
 	cd ozlib
 	#Generate makefile via qmake
 	qmake "$SRC_DIR/ozlib/ozlib.pro" -spec win32-g++
-	#Run make_all calistiriliyor
+	#Run make_all
 	$MAKE_COMMAND qmake_all
 	#Compile project
 	$MAKE_COMMAND -f Makefile.Release

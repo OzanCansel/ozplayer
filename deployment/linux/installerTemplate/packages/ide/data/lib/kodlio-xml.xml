@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="text/x-kodlio">
+        <comment>Kodlio source code</comment>
+	<comment xml:lang="ara">شفرة مصدر Kodlio</comment>
+	<comment xml:lang="be@latin">Kryničny kod Kodlio</comment>
+	<comment xml:lang="bg">Изходен код на Kodlio</comment>
+	<comment xml:lang="ca">codi font en Kodlio</comment>
+	<comment xml:lang="da">Kodliokildekode</comment>
+	<comment xml:lang="de">Kodlio-Quelltext</comment>
+	<comment xml:lang="el">πηγαίος κώδικας Kodlio</comment>
+	<comment xml:lang="en_GB">Kodlio source code</comment>
+	<comment xml:lang="eo">Kodlio-fontkodo</comment>
+	<comment xml:lang="es">código fuente en Kodlio</comment>
+	<comment xml:lang="eu">Kodlio iturburu-kodea</comment>
+	<comment xml:lang="fi">Kodlio-lähdekoodi</comment>
+	<comment xml:lang="fr">code source Kodlio</comment>
+	<comment xml:lang="ga">cód foinseach Kodlio</comment>
+	<comment xml:lang="hu">Kodlio-forráskód</comment>
+	<comment xml:lang="id">Kode program Kodlio</comment>
+	<comment xml:lang="it">Codice sorgente Kodlio</comment>
+	<comment xml:lang="ja">Kodlio ソースコード</comment>
+	<comment xml:lang="lt">Kodlio pradinis kodas</comment>
+	<comment xml:lang="lv">Kodlio pirmkods</comment>
+	<comment xml:lang="ms">Kod sumber Kodlio</comment>
+	<comment xml:lang="nb">Kodlio-kildekode</comment>
+	<comment xml:lang="nl">Kodlio-broncode</comment>
+	<comment xml:lang="nn">Kodlio-kjeldekode</comment>
+	<comment xml:lang="pl">Kod źródłowy Kodlio</comment>
+	<comment xml:lang="pt">código fonte Kodlio</comment>
+	<comment xml:lang="pt_BR">Código fonte Kodlio</comment>
+	<comment xml:lang="ru">исходный код Kodlio</comment>
+	<comment xml:lang="sq">Kod burues Kodlio</comment>
+	<comment xml:lang="sv">Kodlio-källkod</comment>
+	<comment xml:lang="uk">Вихідний код на мові Kodlio</comment>
+	<comment xml:lang="vi">Mã nguồn Kodlio</comment>
+	<comment xml:lang="zh_CN">Kodlio 源代码</comment>
+	<comment xml:lang="zh_TW">Kodlio 源代碼</comment>
+        <sub-class-of type="text/x-c++src"/>
+        <glob pattern="*.cpp"/>
+    </mime-type>
+</mime-info>

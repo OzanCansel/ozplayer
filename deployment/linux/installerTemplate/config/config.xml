@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>Kodlio</Name>
+    <Version>1.0.0</Version>
+    <Title>Kodlio Kurulum</Title>
+    <Publisher>Kodlio</Publisher>
+	 <ProductUrl>http://www.kodlio.com</ProductUrl>
+	 <MaintenanceToolName>KodlioMaintenanceTool</MaintenanceToolName>
+    <StartMenuDir>Kodlio</StartMenuDir>
+    <TargetDir>@HomeDir@/Kodlio</TargetDir>
+	<ControlScript>controlscript.js</ControlScript>
+	<InstallerApplicationIcon>app.ico</InstallerApplicationIcon>
+	<InstallerWindowIcon>app.ico</InstallerWindowIcon>
+	<Logo>app-logo.png</Logo>
+	<WizardStyle>Modern</WizardStyle>
+</Installer>

@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QDir>
 
 MainWindow::MainWindow(QSharedPointer<QSettings> settings , QWidget *parent) :
     QMainWindow(parent),
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QSharedPointer<QSettings> settings , QWidget *parent) :
 
     connect(ui->browseButton , &QPushButton::clicked , this , &MainWindow::browse);
     connect(ui->saveButton , &QPushButton::clicked , this , &MainWindow::saveSettings);
+
 }
 
 MainWindow::~MainWindow()
@@ -40,4 +42,31 @@ void MainWindow::browse(bool enabled){
 
     mSettings->setValue(QStringLiteral("baseDir") , dir);
     ui->baseDirectoryTextEdit->setText(dir);
+}
+
+void MainWindow::installService(bool enabled){
+    auto serverExecutablePath = QDir(QApplication::applicationDirPath()).filePath(QStringLiteral("server.exe"));
+    //Installing service
+    mServiceController.install(serverExecutablePath);
+    if(!mServiceController.isInstalled())
+        QMessageBox::critical(this , QStringLiteral("Error !") , QStringLiteral("Could not install the service"));
+
+    bindServiceStatus();
+}
+
+void MainWindow::startService(bool enabled){
+
+}
+
+void MainWindow::stopService(bool enabled){
+
+}
+
+void MainWindow::bindServiceStatus(){
+    //If not installed don't check whether it is running or not
+    if(!mServiceController.isInstalled()){
+        ui->serviceStatusLabel->setText(QStringLiteral("Not Installed"));
+    } else { //If installed, check running or not
+        ui->serviceStatusLabel->setText(mServiceController.isRunning() ? QStringLiteral("Running") : QStringLiteral("Not running"));
+    }
 }
