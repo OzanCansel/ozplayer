@@ -9,3 +9,24 @@ bool OsInfo::isWindows(){
 #endif
     return false;
 }
+
+bool OsInfo::isUnix(){
+#ifdef Q_OS_LINUX
+    #ifndef Q_OS_ANDROID
+        return true;
+    #endif
+#endif
+#ifdef Q_OS_UNIX
+    #ifndef Q_OS_ANDROID
+        return true;
+    #endif
+#endif
+        return false;
+}
+
+bool OsInfo::isAndroid(){
+#ifdef Q_OS_ANDROID
+    return true;
+#endif
+    return false;
+}

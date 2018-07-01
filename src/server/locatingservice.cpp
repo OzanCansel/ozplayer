@@ -32,6 +32,7 @@ void LocatingService::init(){
 //        }
 //    }
     connect(&mSocket , &QUdpSocket::readyRead , this , &LocatingService::processPendingDatagrams);
+    qDebug() << "LocatingService is initiated. UdpSocket listening " << mPort;
 }
 
 void LocatingService::processPendingDatagrams(){

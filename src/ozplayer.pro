@@ -14,4 +14,12 @@ SUBDIRS += \
     server
 }
 
+unix: {
+SUBDIRS += \
+    ozlib \
+    mobile \
+    configurator \
+    server
+}
+
 

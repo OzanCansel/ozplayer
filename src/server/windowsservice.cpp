@@ -4,6 +4,7 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QDir>
+#include "osinfo.h"
 
 WindowsService::WindowsService(int argc, char **argv)
     :
@@ -19,7 +20,8 @@ WindowsService::~WindowsService() { }
 void WindowsService::start(){
     mPlayer = QSharedPointer<PlayerService>::create();
     QSettings settings(QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat);
-    QString path = settings.value("baseDir" , QVariant("C:/Users")).toString();
+    auto baseDir = OsInfo().isWindows() ? QStringLiteral("C:/Users") : QStringLiteral("/home");
+    QString path = settings.value(QStringLiteral("baseDir") , QVariant(baseDir)).toString();
     mPlayer->setBasePath(path);
 
     mPlayer->init();

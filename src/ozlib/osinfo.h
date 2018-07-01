@@ -10,6 +10,8 @@ class OsInfo : public QObject
 public slots:
 
     bool isWindows();
+    bool isUnix();
+    bool isAndroid();
 
 };
 

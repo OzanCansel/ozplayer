@@ -16,6 +16,7 @@ void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
     connect(&mPlayer , &QMediaPlayer::mediaStatusChanged , this , &PlayerService::mediaStatusChanged);
     mServer.listen();
+    qDebug() << "PlayerService initiated. TcpServer listening " << port();
 }
 
 int PlayerService::port(){
