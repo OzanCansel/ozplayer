@@ -220,6 +220,16 @@ ApplicationWindow {
             playerProxy.volumeDown()
             event.accepted = true
         }
+
+        Keys.onRightPressed: {
+            playerProxy.volumeUp()
+            event.accepted = true
+        }
+
+        Keys.onLeftPressed: {
+            playerProxy.volumeDown()
+            event.accepted = true
+        }
     }
 
     Image{

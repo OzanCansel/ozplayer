@@ -108,6 +108,7 @@ Item {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 z : 3
+                enabled : !delegateItem.isFolder
 
                 Button{
                     id : playButton
