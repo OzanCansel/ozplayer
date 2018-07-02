@@ -11,7 +11,7 @@ ApplicationWindow {
     width: visibility == ApplicationWindow.Windowed ? Screen.height * 0.4 : Screen.width
     height: visibility == ApplicationWindow.Windowed ? Screen.height * 0.8 : Screen.height
     visibility: osInfo.isAndroid() ? ApplicationWindow.FullScreen :  (fullscreenButton.checked ? ApplicationWindow.FullScreen : ApplicationWindow.Windowed)
-    title: qsTr("Oz Player")
+    title: qsTr("OzPlayer")
 
     header: Item {
         height : Responsive.v(140)

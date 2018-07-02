@@ -11,12 +11,17 @@
 #include "pausecommand.h"
 #include "resumecommand.h"
 #include "volumenotify.h"
+#include "QsLog.h"
+
+using namespace QsLogging;
 
 void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
     connect(&mPlayer , &QMediaPlayer::mediaStatusChanged , this , &PlayerService::mediaStatusChanged);
     mServer.listen();
-    qDebug() << "PlayerService initiated. TcpServer listening " << port();
+
+
+    QLOG_INFO() << "PlayerService initiated. TcpServer listening " << port();
 }
 
 int PlayerService::port(){
@@ -103,7 +108,7 @@ void PlayerService::messageIncome(){
         //Deserialize
         retrieveEntriesCmd.deserialize(json);
 
-        qDebug() << retrieveEntriesCmd.path().toUtf8();
+        QLOG_INFO() << retrieveEntriesCmd.path().toUtf8();
 
         QDir requestedDir(mBasePath);
         requestedDir.cd(retrieveEntriesCmd.path());
@@ -121,7 +126,7 @@ void PlayerService::messageIncome(){
             entryInfo.setIsFolder(entry.isDir());
             entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.filePath().toUtf8()));
             result.entries().append(entryInfo);
-            qDebug() << "   " << entryInfo.path() << " added.";
+            QLOG_INFO() << "   " << entryInfo.path() << " added.";
         }
 
         socket->write(QJsonDocument(result.serialize()).toJson());
@@ -158,7 +163,7 @@ void PlayerService::messageIncome(){
         VolumeNotify notify;
         notify.setVolume(mPlayer.volume());
         broadcast(notify.serialize());
-        qDebug() << "volumeUp => " << volume;
+        QLOG_INFO() << "volumeUp => " << volume;
     } else if(cmd == "volumeDown"){
         auto volume = mPlayer.volume() - 5;
         if(volume < 0)
@@ -167,7 +172,7 @@ void PlayerService::messageIncome(){
         VolumeNotify notify;
         notify.setVolume(mPlayer.volume());
         broadcast(notify.serialize());
-        qDebug() << "volumeDown => " << volume;
+        QLOG_INFO() << "volumeDown => " << volume;
     } else if(cmd == "getCurrentTrack"){
         CurrentTrackNotify notify;
         notify.setStatus(mTrackStatus);

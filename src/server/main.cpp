@@ -7,6 +7,10 @@
 #include <QDebug>
 #include <qtservice.h>
 #include "windowsservice.h"
+#include "QsLog.h"
+
+using namespace QsLogging;
+
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -33,7 +37,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(myMessageOutput);
     WindowsService wService(argc , argv);
 
     return wService.exec();

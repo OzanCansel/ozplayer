@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QHostAddress>
 #include <QUdpSocket>
+#include <QTimer>
 
 class LocatingService : public QObject
 {
@@ -17,6 +18,7 @@ public:
 private slots:
 
     void processPendingDatagrams();
+    void broadcast();
 
 private:
 
@@ -26,6 +28,7 @@ private:
     int mTcpServerPort;
     QUdpSocket mSocket;
     QString mPcName;
+    QTimer mBroadcastTimer;
 
 };
 

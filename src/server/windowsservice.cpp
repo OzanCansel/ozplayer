@@ -5,6 +5,9 @@
 #include <QSettings>
 #include <QDir>
 #include "osinfo.h"
+#include "QsLog.h"
+
+using namespace QsLogging;
 
 WindowsService::WindowsService(int argc, char **argv)
     :
@@ -18,6 +21,9 @@ WindowsService::WindowsService(int argc, char **argv)
 WindowsService::~WindowsService() { }
 
 void WindowsService::start(){
+    Logger::instance().initAsDefault("logs" , "service.log");
+    Logger::instance().setLoggingLevel(QsLogging::Level::InfoLevel);
+    QLOG_INFO() << "Windows service started.";
     mPlayer = QSharedPointer<PlayerService>::create();
     QSettings settings(QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat);
     auto baseDir = OsInfo().isWindows() ? QStringLiteral("C:/Users") : QStringLiteral("/home");
@@ -28,7 +34,7 @@ void WindowsService::start(){
 
     mLocator = QSharedPointer<LocatingService>::create(
                 QHostAddress(QStringLiteral("239.255.43.21")) ,
-                                    45454 ,
+                                    24942 ,
                                     mPlayer->port() ,
                                     QHostInfo::localHostName()
                 );

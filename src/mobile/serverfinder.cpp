@@ -25,14 +25,17 @@ void ServerFinder::search(){
         mSocket.open(QIODevice::ReadWrite);
 
     auto datagram = QJsonDocument(FindPlayerIpCmd().serialize()).toJson();
-    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
-        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
-            QHostAddress broadcastAddress = entry.broadcast();
-            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
-                mSocket.writeDatagram(datagram , broadcastAddress , 45454);
-            }
-        }
-    }
+//    foreach (QNetworkInterface interface, QNetworkInterface::allInterfaces()) {
+//        foreach (QNetworkAddressEntry entry, interface.addressEntries()) {
+//            QHostAddress broadcastAddress = entry.broadcast();
+//            if (broadcastAddress != QHostAddress::Null && entry.ip() != QHostAddress::LocalHost) {
+//                mSocket.writeDatagram(datagram , broadcastAddress , 24944);
+//            }
+//        }
+//    }
+
+//    mSocket.writeDatagram(datagram , QHostAddress::Broadcast , 24944);
+    mSocket.bind(24941);
 }
 
 void ServerFinder::searchTimedout(){

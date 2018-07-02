@@ -6,8 +6,11 @@
 #include <QDebug>
 #include "findplayeripcmd.h"
 #include "playeripresult.h"
+#include "QsLog.h"
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
+
+using namespace QsLogging;
 
 LocatingService::LocatingService(QHostAddress addr , int port ,
                                  int tcpServerPort ,
@@ -20,33 +23,37 @@ LocatingService::LocatingService(QHostAddress addr , int port ,
 {   }
 
 void LocatingService::init(){
-//    mSocket.bind(QHostAddress::AnyIPv4 , static_cast<quint16>(mPort) , QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
-    mSocket.bind(QHostAddress::Any , static_cast<quint16>(mPort) , QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
-//    foreach (auto interface, QNetworkInterface::allInterfaces()) {
-//        qDebug() << "Joining " << interface.humanReadableName() << "'s group.";
-//        mSocket.joinMulticastGroup(mAddr , interface);
-//        qDebug() << interface.allAddresses();
-//        //If cannot multicast
-//        if(!(interface.flags() & QNetworkInterface::CanMulticast)){
-//            qDebug() << "Cannot multicast on " << interface.humanReadableName();
-//        }
-//    }
-    connect(&mSocket , &QUdpSocket::readyRead , this , &LocatingService::processPendingDatagrams);
-    qDebug() << "LocatingService is initiated. UdpSocket listening " << mPort;
+    connect(&mSocket , &QUdpSocket::stateChanged , this , [&](QAbstractSocket::SocketState state) {
+        if(state == QAbstractSocket::BoundState){
+            connect(&mSocket , &QUdpSocket::readyRead , this , &LocatingService::processPendingDatagrams);
+            QLOG_INFO() << "Bounded and connected";
+        }
+    });
+
+    if(!mSocket.bind(static_cast<quint16>(mPort))){
+        QLOG_ERROR() << "Could not bind Udp Socket.";
+        return;
+    }
+
+    connect(&mBroadcastTimer , &QTimer::timeout , this , &LocatingService::broadcast);
+    mBroadcastTimer.setInterval(1000);
+    mBroadcastTimer.start();
+    QLOG_INFO() << "LocatingService is initiated. UdpSocket listening " << mPort;
 }
 
 void LocatingService::processPendingDatagrams(){
     QByteArray datagram;
 
-    qDebug() << "Pending datagrams";
+    QLOG_INFO() << "Pending datagrams";
     while(mSocket.hasPendingDatagrams()){
         datagram.resize(static_cast<int>(mSocket.pendingDatagramSize()));
         QHostAddress cliAddr;
 
         quint16 cliPort;
         mSocket.readDatagram(datagram.data() , datagram.size() , &cliAddr , &cliPort);
-        qDebug() << "Client host " << cliAddr.toString();
+        QLOG_INFO() << "Client host " << cliAddr.toString();
         auto data = static_cast<QString>(datagram.constData());
+        QLOG_INFO() << "Datagram received => " << data;
         auto json = QJsonDocument::fromJson(data.toUtf8()).object();
 
         if(json.isEmpty())
@@ -111,4 +118,33 @@ QString LocatingService::bestSimilar(QString ip, QStringList strs){
     }
 
     return returned;
+}
+
+void LocatingService::broadcast(){
+    QUdpSocket broadcastSocket;
+
+    QRegularExpression ipMask("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+
+    foreach (const QNetworkInterface &netInterface, QNetworkInterface::allInterfaces()) {
+        QNetworkInterface::InterfaceFlags flags = netInterface.flags();
+        if( (bool)(flags & QNetworkInterface::IsRunning) && !(bool)(flags & QNetworkInterface::IsLoopBack)){
+            foreach (const QNetworkAddressEntry &address, netInterface.addressEntries()) {
+                if(address.ip().protocol() == QAbstractSocket::IPv4Protocol){
+                    auto host = ipMask.match(address.ip().toString());
+                    auto broadcastAddr = address.broadcast();
+
+                    PlayerIpResult result;
+                    result.setIp(host.captured(0));
+                    result.setPort(mTcpServerPort);
+                    result.setPcName(mPcName);
+
+                    auto json = QJsonDocument(result.serialize()).toJson();
+                    broadcastSocket.writeDatagram(json , broadcastAddr , mPort - 1);
+
+                    QLOG_INFO() << json << " to => " << broadcastAddr.toString() << " over " << mPort - 1<< " port";
+                }
+            }
+        }
+    }
+
 }

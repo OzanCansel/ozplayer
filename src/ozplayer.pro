@@ -6,20 +6,13 @@ SUBDIRS += \
     mobile
 }
 
-win32: {
+!android: {
 SUBDIRS += \
     ozlib \
     mobile \
     configurator \
-    server
-}
-
-unix: {
-SUBDIRS += \
-    ozlib \
-    mobile \
-    configurator \
-    server
+    server \
+	third_party/qslog
 }
 
 

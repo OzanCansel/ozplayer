@@ -49,3 +49,10 @@ unix:!macx: LIBS += -L$$PWD/../third_party/qtservice/lib/ -lQtSolutions_Service-
 
 INCLUDEPATH += $$PWD/../third_party/qtservice/include
 DEPENDPATH += $$PWD/../third_party/qtservice/include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../third_party/qslog/release/ -lqslog
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../third_party/qslog/debug/ -lqslog
+else:unix: LIBS += -L$$OUT_PWD/../third_party/qslog/ -lqslog
+
+INCLUDEPATH += $$PWD/../third_party/qslog
+DEPENDPATH += $$PWD/../third_party/qslog
