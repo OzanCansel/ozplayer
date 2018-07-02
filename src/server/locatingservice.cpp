@@ -36,8 +36,8 @@ void LocatingService::init(){
     }
 
     connect(&mBroadcastTimer , &QTimer::timeout , this , &LocatingService::broadcast);
-    mBroadcastTimer.setInterval(1000);
-    mBroadcastTimer.start();
+//    mBroadcastTimer.setInterval(1000);
+//    mBroadcastTimer.start();
     QLOG_INFO() << "LocatingService is initiated. UdpSocket listening " << mPort;
 }
 

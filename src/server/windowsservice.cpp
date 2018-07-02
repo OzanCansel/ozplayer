@@ -34,7 +34,7 @@ void WindowsService::start(){
 
     mLocator = QSharedPointer<LocatingService>::create(
                 QHostAddress(QStringLiteral("239.255.43.21")) ,
-                                    24942 ,
+                                    24944 ,
                                     mPlayer->port() ,
                                     QHostInfo::localHostName()
                 );
