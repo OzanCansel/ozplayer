@@ -18,7 +18,7 @@ ApplicationWindow {
         width: app.width
         visible: stack.depth
 
-        Button{
+        Button {
             id : backButton
             height: Responsive.v(140)
             width:Responsive.h(140)
@@ -169,6 +169,7 @@ ApplicationWindow {
 
     ServerFinder{
         id : serverFinder
+        enabled: stack.currentItem == searchServer
     }
 
     PlayerProxy{
@@ -187,7 +188,6 @@ ApplicationWindow {
         id:stack
         z : 3
         anchors.fill:parent
-
         initialItem : searchServer
 
         Connection {

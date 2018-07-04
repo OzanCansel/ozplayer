@@ -25,6 +25,7 @@ void WindowsService::start(){
     Logger::instance().setLoggingLevel(QsLogging::Level::InfoLevel);
     QLOG_INFO() << "Windows service started.";
     mPlayer = QSharedPointer<PlayerService>::create();
+    mPlayer->stop();
     QSettings settings(QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat);
     auto baseDir = OsInfo().isWindows() ? QStringLiteral("C:/Users") : QStringLiteral("/home");
     QString path = settings.value(QStringLiteral("baseDir") , QVariant(baseDir)).toString();
@@ -43,11 +44,11 @@ void WindowsService::start(){
 }
 
 void WindowsService::stop(){
-
+    mPlayer->stop();
 }
 void WindowsService::pause(){
-
+    mPlayer->pause();
 }
 void WindowsService::resume(){
-
+    mPlayer->start();
 }

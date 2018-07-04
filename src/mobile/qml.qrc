@@ -8,5 +8,6 @@
         <file>qml/Connection.qml</file>
         <file>qml/FontCollection.qml</file>
         <file>qml/PlayerControl.qml</file>
+        <file>qml/Debug.qml</file>
     </qresource>
 </RCC>

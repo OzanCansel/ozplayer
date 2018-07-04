@@ -17,7 +17,11 @@ MainWindow::MainWindow(QSharedPointer<QSettings> settings , QWidget *parent) :
 
     connect(ui->browseButton , &QPushButton::clicked , this , &MainWindow::browse);
     connect(ui->saveButton , &QPushButton::clicked , this , &MainWindow::saveSettings);
+    connect(ui->startServiceButton , &QPushButton::clicked , this , &MainWindow::startService);
+    connect(ui->stopServiceButton , &QPushButton::clicked , this , &MainWindow::stopService);
+    connect(ui->installServiceButton , &QPushButton::clicked , this , &MainWindow::installService);
 
+    bindServiceStatus();
 }
 
 MainWindow::~MainWindow()
@@ -45,6 +49,9 @@ void MainWindow::browse(bool enabled){
 }
 
 void MainWindow::installService(bool enabled){
+    Q_UNUSED(enabled)
+    if(mServiceController.isInstalled())
+        return;
     auto serverExecutablePath = QDir(QApplication::applicationDirPath()).filePath(QStringLiteral("server.exe"));
     //Installing service
     mServiceController.install(serverExecutablePath);
@@ -55,18 +62,33 @@ void MainWindow::installService(bool enabled){
 }
 
 void MainWindow::startService(bool enabled){
-
+    Q_UNUSED(enabled)
+    mServiceController.start();
+    bindServiceStatus();
 }
 
 void MainWindow::stopService(bool enabled){
-
+    Q_UNUSED(enabled)
+    mServiceController.stop();
+    bindServiceStatus();
 }
 
 void MainWindow::bindServiceStatus(){
     //If not installed don't check whether it is running or not
     if(!mServiceController.isInstalled()){
         ui->serviceStatusLabel->setText(QStringLiteral("Not Installed"));
+        ui->startServiceButton->setEnabled(false);
+        ui->stopServiceButton->setEnabled(false);
+        ui->installServiceButton->setEnabled(true);
     } else { //If installed, check running or not
         ui->serviceStatusLabel->setText(mServiceController.isRunning() ? QStringLiteral("Running") : QStringLiteral("Not running"));
+        ui->installServiceButton->setEnabled(false);
+        if(mServiceController.isRunning()){
+            ui->startServiceButton->setEnabled(false);
+            ui->stopServiceButton->setEnabled(true);
+        } else {
+            ui->startServiceButton->setEnabled(true);
+            ui->stopServiceButton->setEnabled(false);
+        }
     }
 }

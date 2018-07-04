@@ -14,6 +14,12 @@ void ServerFinder::registerQmlType(){
 
 ServerFinder::ServerFinder(){
     connect(&mSocket , &QUdpSocket::readyRead , this , &ServerFinder::messageIncome);
+    connect(&mListener , &QUdpSocket::readyRead , this , &ServerFinder::ipReceived);
+    connect(this , &ServerFinder::enabledChanged , this , &ServerFinder::checkListenerSocket);
+
+    if(mListener.bind(24943)){
+        qDebug() << "Listener socket could not bind";
+    }
 }
 
 QVariantList ServerFinder::servers(){
@@ -33,8 +39,6 @@ void ServerFinder::search(){
             }
         }
     }
-
-//    mSocket.writeDatagram(datagram , QHostAddress::Broadcast , 24944);
 }
 
 void ServerFinder::searchTimedout(){
@@ -42,6 +46,45 @@ void ServerFinder::searchTimedout(){
         mSocket.close();
 
     emit searchTimedout();
+}
+
+void ServerFinder::checkListenerSocket(){
+    if(isEnabled()){
+//        connect(&mListener , &QUdpSocket::readyRead , this , &ServerFinder::ipReceived , Qt::UniqueConnection);
+        mListener.bind(24943);
+    } else {
+        mListener.abort();
+    }
+}
+
+void ServerFinder::ipReceived(){
+    qDebug() << "Received";
+    QByteArray datagram;
+    datagram.resize(int(mListener.pendingDatagramSize()));
+    mListener.readDatagram(datagram.data() , datagram.size());
+    auto json = QJsonDocument::fromJson(datagram).object();
+
+    if(json.isEmpty())
+        return;
+
+    if(!json.contains(QStringLiteral("cmd")))
+        return;
+
+    auto cmd = json[QStringLiteral("cmd")].toString();
+
+    if(cmd == PlayerIpResult::CMD){
+        PlayerIpResult ipResult;
+        ipResult.deserialize(json);
+
+        if(exists(ipResult))
+            return;
+        QVariantMap variant;
+        variant["ip"] = ipResult.ip();
+        variant["port"] = ipResult.port();
+        variant["pcName"] = ipResult.pcName();
+        mServers.append(variant);
+        emit serversChanged();
+    }
 }
 
 void ServerFinder::messageIncome(){
@@ -62,6 +105,8 @@ void ServerFinder::messageIncome(){
         PlayerIpResult ipResult;
 
         ipResult.deserialize(json);
+        if(exists(ipResult))
+            return;
         QVariantMap variant;
         variant["ip"] = ipResult.ip();
         variant["port"] = ipResult.port();
@@ -71,3 +116,12 @@ void ServerFinder::messageIncome(){
     }
 }
 
+bool ServerFinder::exists(PlayerIpResult &ip){
+    for(auto variant : mServers){
+        if(variant.toMap()["ip"].toString() == ip.ip() &&
+                variant.toMap()["port"].toInt() == ip.port())
+            return true;
+    }
+
+    return false;
+}

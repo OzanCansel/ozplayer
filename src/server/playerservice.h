@@ -19,13 +19,16 @@ public:
     void newConnection();
     void setBasePath(QString);
     QString basePath();
+    void stop();
+    void pause();
+    void start();
+    void play(PlayCommand&);
 
 private slots:
 
     void messageIncome();
     void clientDisconnected();
     void mediaStatusChanged(QMediaPlayer::MediaStatus);
-    void play(PlayCommand&);
 
 private:
 

@@ -45,6 +45,13 @@ void PlayerProxy::open(QString host, int port){
     }
 }
 
+void PlayerProxy::close(){
+    if(mSocket.isOpen())
+        mSocket.close();
+
+    emit connectedChanged();
+}
+
 void PlayerProxy::messageIncome(){
     mBuffer.append(mSocket.readAll());
 

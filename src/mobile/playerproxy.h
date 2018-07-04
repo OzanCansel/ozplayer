@@ -49,6 +49,7 @@ signals:
 public slots:
 
     void open(QString , int);
+    void close();
     void retrieveFiles(QString);
     void retrieveCurrentTrack();
     void play(QString);

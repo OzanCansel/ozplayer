@@ -36,8 +36,8 @@ void LocatingService::init(){
     }
 
     connect(&mBroadcastTimer , &QTimer::timeout , this , &LocatingService::broadcast);
-//    mBroadcastTimer.setInterval(1000);
-//    mBroadcastTimer.start();
+    mBroadcastTimer.setInterval(3000);
+    mBroadcastTimer.start();
     QLOG_INFO() << "LocatingService is initiated. UdpSocket listening " << mPort;
 }
 
@@ -140,11 +140,9 @@ void LocatingService::broadcast(){
 
                     auto json = QJsonDocument(result.serialize()).toJson();
                     broadcastSocket.writeDatagram(json , broadcastAddr , mPort - 1);
-
-                    QLOG_INFO() << json << " to => " << broadcastAddr.toString() << " over " << mPort - 1<< " port";
+                    broadcastSocket.waitForBytesWritten();
                 }
             }
         }
     }
-
 }

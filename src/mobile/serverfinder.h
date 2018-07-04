@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QVariantList>
 #include <QTimer>
+#include "playeripresult.h"
 
 class ServerFinder : public QQuickItem
 {
@@ -26,19 +27,25 @@ public slots:
 private slots:
 
     void messageIncome();
+    void ipReceived();
     void searchTimedout();
+    void checkListenerSocket();
 
 signals:
 
     void searchStarted();
     void searchFinished();
     void serversChanged();
+    void debug(QString message);
 
 private:
+
+    bool exists(PlayerIpResult&);
 
     QString selfAddress();
     QHostAddress mMulticastGroup;
     QUdpSocket mSocket;
+    QUdpSocket mListener;
     QVariantList mServers;
     QTimer mSearchTimeout;
 

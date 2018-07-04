@@ -39,6 +39,42 @@ void PlayerService::newConnection(){
     mClients.append(socket);
 }
 
+void PlayerService::start(){
+    if(mPlayer.state() != QMediaPlayer::PlayingState){
+        mPlayer.play();
+
+        mTrackStatus = TrackStatus::Playing;
+
+        CurrentTrackNotify notify;
+
+        notify.setStatus(mTrackStatus);
+        notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+        broadcast(notify.serialize());
+    }
+}
+
+void PlayerService::stop(){
+    if(mPlayer.state() != QMediaPlayer::PausedState){
+        mPlayer.pause();
+        mTrackStatus = TrackStatus::Paused;
+        CurrentTrackNotify notify;
+        notify.setStatus(mTrackStatus);
+        notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+        broadcast(notify.serialize());
+    }
+}
+
+void PlayerService::pause(){
+    if(mPlayer.state() != QMediaPlayer::PausedState){
+        mPlayer.pause();
+        mTrackStatus = TrackStatus::Paused;
+        CurrentTrackNotify notify;
+        notify.setStatus(mTrackStatus);
+        notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
+        broadcast(notify.serialize());
+    }
+}
+
 void PlayerService::clientDisconnected(){
     auto socket = static_cast<QTcpSocket*>(QObject::sender());
     //Remove from list
