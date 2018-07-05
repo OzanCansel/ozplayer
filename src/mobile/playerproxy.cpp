@@ -29,6 +29,7 @@ PlayerProxy::PlayerProxy()
 }
 
 void PlayerProxy::open(QString host, int port){
+    close();
     if(host == NetworkUtil::selfAddress())
         mSocket.connectToHost(QHostAddress::LocalHost , port);
     else
@@ -46,8 +47,10 @@ void PlayerProxy::open(QString host, int port){
 }
 
 void PlayerProxy::close(){
-    if(mSocket.isOpen())
+    if(mSocket.isOpen()){
+        mSocket.abort();
         mSocket.close();
+    }
 
     emit connectedChanged();
 }
