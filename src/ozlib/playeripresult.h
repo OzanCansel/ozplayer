@@ -11,9 +11,11 @@ public:
     static const QString CMD;
     QString ip();
     int port();
+    int fileServicePort();
     void setIp(QString);
     void setPort(int);
     void setPcName(QString);
+    void setFileServicePort(int);
     QString pcName();
     void deserialize(const QJsonObject&) override;
     QJsonObject serialize() override;
@@ -21,6 +23,7 @@ public:
 private:
 
     int mPort;
+    int mFileServicePort;
     QString mIp;
     QString mPcName;
 

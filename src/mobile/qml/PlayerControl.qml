@@ -110,10 +110,33 @@ Item {
                 z : 3
                 enabled : !delegateItem.isFolder
 
+                Button {
+                    id : downloadButton
+                    width : Responsive.v(100)
+                    height: Responsive.h(150)
+                    visible: !delegateItem.isFolder
+                    background: Image{
+                        source: proxy.fileExists(delegateItem.path) ? "/res/img/downloaded.png" : "/res/img/download.png"
+                        width: Responsive.v(50)
+                        height:Responsive.v(50)
+                        fillMode: Image.PreserveAspectFit
+                        anchors.verticalCenter: downloadButton.verticalCenter
+                    }
+                    anchors.verticalCenter: parent.verticalCenter
+                    enabled: serverList.currentIndex == index
+                    onClicked: {
+                        if(proxy.fileExists(delegateItem.path))
+                            return
+
+                        proxy.downloadFile(delegateItem.path)
+                    }
+                }
+
                 Button{
                     id : playButton
-                    width : Responsive.v(130)
+                    width : !visible ? Responsive.h(0) : Responsive.v(100)
                     height: Responsive.h(150)
+                    visible: !delegateItem.isCurrent && !delegateItem.isFolder && serverList.currentIndex == index
                     background: Image{
                         source: "/res/img/play.png"
                         width:Responsive.v(50)
@@ -123,31 +146,36 @@ Item {
                         anchors.verticalCenter: playButton.verticalCenter
                     }
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: !delegateItem.isCurrent
-                    enabled : !delegateItem.isCurrent && serverList.currentIndex == index
                     onClicked:  proxy.play(delegateItem.path)
+
+                    Behavior on width{
+                        NumberAnimation{ }
+                    }
                 }
 
-                Button{
+                Button {
                     id : resumePauseButton
-                    width : Responsive.v(130)
+                    width : !visible ? Responsive.h(0) : Responsive.v(100)
                     height: Responsive.h(150)
+                    visible: delegateItem.isCurrent && !delegateItem.isFolder
                     background: Image{
                         source: proxy.trackStatus == 1 ? "/res/img/play.png" : "/res/img/pause.png"
                         width: Responsive.v(50)
                         height:Responsive.v(50)
                         fillMode: Image.PreserveAspectFit
-                        visible:serverList.currentIndex == index && !delegateItem.isFolder
                         anchors.verticalCenter: resumePauseButton.verticalCenter
                     }
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: delegateItem.isCurrent
                     enabled: serverList.currentIndex == index
                     onClicked: {
                         if(proxy.trackStatus == 1)
                             proxy.resume()
                         else
                             proxy.pause()
+                    }
+
+                    Behavior on width{
+                        NumberAnimation{ }
                     }
                 }
             }

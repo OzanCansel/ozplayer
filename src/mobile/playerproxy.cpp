@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTimer>
+#include <QCoreApplication>
 #include "networkutil.h"
 #include "retrieveentriescommand.h"
 #include "entrylistresult.h"
@@ -16,6 +17,9 @@
 #include "namedcommand.h"
 #include "currenttracknotify.h"
 #include "volumenotify.h"
+#include "identifycommand.h"
+#include "downloadfilecmd.h"
+#include "token.h"
 
 void PlayerProxy::registerQmlType(){
     qmlRegisterType<PlayerProxy>("mobile" , 1 , 0 , "PlayerProxy");
@@ -24,6 +28,7 @@ void PlayerProxy::registerQmlType(){
 PlayerProxy::PlayerProxy()
 {
     connect(&mSocket , &QTcpSocket::readyRead , this , &PlayerProxy::messageIncome);
+    connect(&mFileSocket , &QTcpSocket::readyRead , this, &PlayerProxy::fileIncome);
     mVolume = 70;
     emit volumeChanged();
 }
@@ -41,9 +46,29 @@ void PlayerProxy::open(QString host, int port){
 
     if(mSocket.isOpen()){
         retrieveFiles(QString());
-        QTimer::singleShot(1000 , this , [&]() { retrieveCurrentTrack(); });
+        QTimer::singleShot(500 , this , [&]() { retrieveCurrentTrack(); });
+        QTimer::singleShot(1100 , this , [&]() { retrieveId();});
         emit connectedChanged();
     }
+}
+
+void PlayerProxy::openFileService(QString host, int port){
+    if(mFileSocket.isOpen()){
+        mFileSocket.abort();
+        mFileSocket.close();
+    }
+    if(host == NetworkUtil::selfAddress())
+        mFileSocket.connectToHost(QHostAddress::LocalHost , port);
+    else
+        mFileSocket.connectToHost(QHostAddress(host) , port);
+
+    if(!mFileSocket.waitForConnected(5000)){
+        return;
+    }
+}
+
+void PlayerProxy::retrieveId(){
+    mSocket.write(QJsonDocument(IdentifyCommand().serialize()).toJson());
 }
 
 void PlayerProxy::close(){
@@ -197,7 +222,38 @@ void PlayerProxy::messageIncome(){
         volumeNotify.deserialize(json);
         mVolume = volumeNotify.volume();
         emit volumeChanged();
+    } else if(cmd == IdentifyCommand::CMD){
+        IdentifyCommand identifyCmd;
+        identifyCmd.deserialize(json);
+        mId =  identifyCmd.id();
     }
+}
+
+void PlayerProxy::fileIncome(){
+    if(!mFileSocket.bytesAvailable())   return;
+    mFileBuffer.append(mFileSocket.readAll());
+
+    auto startIdx = mFileBuffer.indexOf(Token::FileDownloadStartToken);
+    auto endIdx = mFileBuffer.indexOf(Token::FileDownloadEndToken);
+    mFileBuffer.remove(0 , startIdx);
+
+    if(endIdx >= 0){
+        mFileBuffer.remove(endIdx , mFileBuffer.length() - endIdx);
+        mFileBuffer.remove(0 , Token::FileDownloadStartToken.length());
+        auto userHome = homeDir();
+        auto downloadingFile = translateToLocal(mDownloadedFileName);
+        userHome.mkpath(downloadingFile.dir().absolutePath());
+        QFile downloadedFile(downloadingFile.filePath());
+        qDebug() << "File path " << translateToLocal(mDownloadedFileName).filePath();
+        if(!downloadedFile.open(QIODevice::WriteOnly)){
+            qDebug() << "Could not open";
+        }
+        downloadedFile.write(mFileBuffer);
+        mFileBuffer.clear();
+        emit entriesChanged();
+    }
+
+    fileIncome();
 }
 
 QVariantList& PlayerProxy::entries(){
@@ -245,6 +301,13 @@ void PlayerProxy::retrieveCurrentTrack(){
     NamedCommand currentTrackCmd("getCurrentTrack");
 
     mSocket.write(QJsonDocument(currentTrackCmd.serialize()).toJson());
+}
+
+void PlayerProxy::downloadFile(QString filePath){
+    DownloadFileCmd downloadCmd;
+    downloadCmd.setFilePath(filePath);
+    mDownloadedFileName = filePath;
+    mFileSocket.write(QJsonDocument(downloadCmd.serialize()).toJson());
 }
 
 void PlayerProxy::play(QString file){
@@ -328,3 +391,17 @@ int PlayerProxy::similarityScore(QString ip, QString str){
 
     return score;
 }
+
+QDir PlayerProxy::homeDir(){
+    return QDir(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("local/%0").arg(mId)));
+}
+
+QFileInfo PlayerProxy::translateToLocal(QString filePath){
+    return QFileInfo(homeDir().filePath(filePath));
+}
+
+bool PlayerProxy::fileExists(QString file){
+    return translateToLocal(file).exists();
+}
+
+QTimer

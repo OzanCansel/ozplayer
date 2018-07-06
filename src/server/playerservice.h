@@ -16,7 +16,6 @@ public:
 
     int port();
     void init();
-    void newConnection();
     void setBasePath(QString);
     QString basePath();
     void stop();
@@ -26,6 +25,7 @@ public:
 
 private slots:
 
+    void newConnection();
     void messageIncome();
     void clientDisconnected();
     void mediaStatusChanged(QMediaPlayer::MediaStatus);

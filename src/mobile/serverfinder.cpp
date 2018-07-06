@@ -82,6 +82,7 @@ void ServerFinder::ipReceived(){
         variant["ip"] = ipResult.ip();
         variant["port"] = ipResult.port();
         variant["pcName"] = ipResult.pcName();
+        variant["fileServerPort"] = ipResult.fileServicePort();
         mServers.append(variant);
         emit serversChanged();
     }

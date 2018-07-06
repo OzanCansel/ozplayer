@@ -6,6 +6,7 @@
 #include <QDir>
 #include "osinfo.h"
 #include "QsLog.h"
+#include <QProcess>
 
 using namespace QsLogging;
 
@@ -23,32 +24,42 @@ WindowsService::~WindowsService() { }
 void WindowsService::start(){
     Logger::instance().initAsDefault("logs" , "service.log");
     Logger::instance().setLoggingLevel(QsLogging::Level::InfoLevel);
-    QLOG_INFO() << "Windows service started.";
-    mPlayer = QSharedPointer<PlayerService>::create();
-    mPlayer->stop();
+
+    QLOG_INFO() << "ozplayer service is started.";
+
+    //Player service init
+    mPlayerService = QSharedPointer<PlayerService>::create();
+    mPlayerService->stop();
     QSettings settings(QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat);
     auto baseDir = OsInfo().isWindows() ? QStringLiteral("C:/Users") : QStringLiteral("/home");
     QString path = settings.value(QStringLiteral("baseDir") , QVariant(baseDir)).toString();
-    mPlayer->setBasePath(path);
+    mPlayerService->setBasePath(path);
+    mPlayerService->init();
 
-    mPlayer->init();
+    //File service init
+    mFileService = QSharedPointer<FileService>::create();
+    mFileService->setBasePath(path);
+    mFileService->init();
 
-    mLocator = QSharedPointer<LocatingService>::create(
+
+    //Locator service init
+    mLocatorService = QSharedPointer<LocatingService>::create(
                 QHostAddress(QStringLiteral("239.255.43.21")) ,
                                     24944 ,
-                                    mPlayer->port() ,
+                                    mPlayerService->port() ,
+                                    mFileService->port() ,
                                     QHostInfo::localHostName()
                 );
 
-    mLocator->init();
+    mLocatorService->init();
 }
 
 void WindowsService::stop(){
-    mPlayer->stop();
+    mPlayerService->stop();
 }
 void WindowsService::pause(){
-    mPlayer->pause();
+    mPlayerService->pause();
 }
 void WindowsService::resume(){
-    mPlayer->start();
+    mPlayerService->start();
 }

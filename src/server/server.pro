@@ -19,12 +19,14 @@ SOURCES += \
         main.cpp \
     locatingservice.cpp \
     playerservice.cpp \
-    windowsservice.cpp
+    windowsservice.cpp \
+    fileservice.cpp
 
 HEADERS += \
     locatingservice.h \
     playerservice.h \
-    windowsservice.h
+    windowsservice.h \
+    fileservice.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ozlib/release/ -lozlib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ozlib/debug/ -lozlib

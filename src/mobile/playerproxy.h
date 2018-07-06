@@ -49,18 +49,25 @@ signals:
 public slots:
 
     void open(QString , int);
+    void openFileService(QString , int);
     void close();
     void retrieveFiles(QString);
     void retrieveCurrentTrack();
+    void retrieveId();
+    void downloadFile(QString);
     void play(QString);
     void resume();
     void pause();
     void volumeDown();
     void volumeUp();
+    bool fileExists(QString);
 
 private:
 
     void messageIncome();
+    void fileIncome();
+    QDir homeDir();
+    QFileInfo translateToLocal(QString);
 
 private:
 
@@ -69,15 +76,20 @@ private:
 
     QVariantList mEntries;
     QTcpSocket mSocket;
+    QTcpSocket mFileSocket;
     QString mIp;
+    QString mId;
     int mPort;
     QByteArray mBuffer;
+    QByteArray mFileBuffer;
     int mBracketsCount { 0 };
     int mLastIdx { 0 };
     bool mIgnore { false };
+    QTimer mDownloadTimeout;
 
     QString mCurrentDirectory;
     QString mCurrentTrack;
+    QString mDownloadedFileName;
     int mTrackStatus;
     int mVolume { 70 };
 

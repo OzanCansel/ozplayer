@@ -26,19 +26,29 @@ void PlayerIpResult::setPort(int port){
     mPort = port;
 }
 
+void PlayerIpResult::setFileServicePort(int port){
+    mFileServicePort = port;
+}
+
+int PlayerIpResult::fileServicePort(){
+    return mFileServicePort;
+}
+
 void PlayerIpResult::deserialize(const QJsonObject &json){
-    mPort = json["port"].toInt();
+    mPort = json["p"].toInt();
+    mFileServicePort = json["fP"].toInt();
     mIp = json["ip"].toString();
-    mPcName = json["pcName"].toString();
+    mPcName = json["pn"].toString();
 }
 
 QJsonObject PlayerIpResult::serialize(){
     QJsonObject json;
 
     json["cmd"] = CMD;
-    json["port"] = mPort;
+    json["p"] = mPort;
+    json["fP"] = mFileServicePort;
     json["ip"] = mIp;
-    json["pcName"] = mPcName;
+    json["pn"] = mPcName;
 
     return json;
 }

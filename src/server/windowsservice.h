@@ -4,6 +4,7 @@
 #include <qtservice.h>
 #include "playerservice.h"
 #include "locatingservice.h"
+#include "fileservice.h"
 #include <QSharedPointer>
 
 #define STATUS_COMMAND 10
@@ -24,8 +25,9 @@ protected:
 
 private:
 
-    QSharedPointer<PlayerService> mPlayer;
-    QSharedPointer<LocatingService> mLocator;
+    QSharedPointer<PlayerService> mPlayerService;
+    QSharedPointer<LocatingService> mLocatorService;
+    QSharedPointer<FileService> mFileService;
 
 };
 

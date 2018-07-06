@@ -16,5 +16,7 @@
         <file>res/img/logout.png</file>
         <file>res/img/fullscreen.png</file>
         <file>res/img/windowed.png</file>
+        <file>res/img/download.png</file>
+        <file>res/img/downloaded.png</file>
     </qresource>
 </RCC>

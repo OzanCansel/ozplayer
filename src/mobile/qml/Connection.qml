@@ -11,7 +11,11 @@ Item {
     id: searchServer
 
     function connectToServer(host , port){
-        playerProxy.open(host , port)
+        proxy.open(host , port)
+    }
+
+    function connectToFileServer(host , port){
+        proxy.openFileService(host , port);
     }
 
     Column{
@@ -71,6 +75,8 @@ Item {
                 height: Responsive.v(150)
                 property var port : finder.servers[index].port
                 property var serverIp : finder.servers[index].ip
+                property var fileServerPort : finder.servers[index].fileServerPort
+
                 Text {
                     anchors.fill:parent
                     text : finder.servers[index].pcName
@@ -89,8 +95,14 @@ Item {
                         if(serverList.currentIndex != index)
                             serverList.currentIndex = index
                     }
-                    onPressAndHold: connectToServer(delegateItem.serverIp , delegateItem.port)
-                    onDoubleClicked: connectToServer(delegateItem.serverIp , delegateItem.port)
+                    onPressAndHold: {
+                        connectToServer(delegateItem.serverIp , delegateItem.port)
+                        connectToFileServer(delegateItem.serverIp , delegateItem.fileServerPort)
+                    }
+                    onDoubleClicked: {
+                        connectToServer(delegateItem.serverIp , delegateItem.port)
+                        connectToFileServer(delegateItem.serverIp , delegateItem.fileServerPort)
+                    }
                 }
             }
             highlight: Rectangle{
@@ -111,6 +123,8 @@ Item {
         visible: serverList.count > 0
         onClicked: {
             connectToServer(serverList.currentItem.serverIp , serverList.currentItem.port)
+            connectToFileServer(serverList.currentItem.serverIp , serverList.currentItem.fileServerPort)
+
         }
     }
 

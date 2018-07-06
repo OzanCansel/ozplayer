@@ -11,6 +11,7 @@
 #include "pausecommand.h"
 #include "resumecommand.h"
 #include "volumenotify.h"
+#include "identifycommand.h"
 #include "QsLog.h"
 
 using namespace QsLogging;
@@ -214,10 +215,20 @@ void PlayerService::messageIncome(){
         notify.setStatus(mTrackStatus);
         notify.setPath(QDir(mBasePath).relativeFilePath(mCurrentTrack));
         broadcast(notify.serialize());
+    } else if(cmd == IdentifyCommand::CMD){
+        IdentifyCommand cmd;
+        auto id = QSysInfo::machineHostName();
+        cmd.setId(id);
+        socket->write(QJsonDocument(cmd.serialize()).toJson());
+        socket->waitForBytesWritten();
     }
 }
 
 void PlayerService::broadcast(QJsonObject&& json){
     auto str = QJsonDocument(json).toJson();
     for(auto socket : mClients)
-        socket->write(str);}
+        socket->write(str);
+
+    for(auto socket : mClients)
+        socket->waitForBytesWritten();
+}

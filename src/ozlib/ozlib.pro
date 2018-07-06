@@ -39,7 +39,10 @@ SOURCES += \
     entryinfo.cpp \
     currenttracknotify.cpp \
     volumenotify.cpp \
-    osinfo.cpp
+    osinfo.cpp \
+    downloadfilecmd.cpp \
+    token.cpp \
+    identifycommand.cpp
 
 HEADERS += \
         lib.h \
@@ -58,7 +61,10 @@ HEADERS += \
     entryinfo.h \
     currenttracknotify.h \
     volumenotify.h \
-    osinfo.h
+    osinfo.h \
+    downloadfilecmd.h \
+    token.h \
+    identifycommand.h
 
 unix {
     target.path = /usr/lib

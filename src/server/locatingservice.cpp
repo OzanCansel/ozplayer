@@ -14,11 +14,13 @@ using namespace QsLogging;
 
 LocatingService::LocatingService(QHostAddress addr , int port ,
                                  int tcpServerPort ,
+                                 int fileServerPort ,
                                  QString pcName)
     :
       mAddr(addr) ,
       mPort(port) ,
       mTcpServerPort(tcpServerPort) ,
+      mFileServerPort(fileServerPort) ,
       mPcName(pcName)
 {   }
 
@@ -94,6 +96,7 @@ void LocatingService::processPendingDatagrams(){
         PlayerIpResult result;
         result.setIp(addr);
         result.setPort(mTcpServerPort);
+        result.setFileServicePort(mFileServerPort);
         result.setPcName(mPcName);
         mSocket.writeDatagram(QJsonDocument(result.serialize()).toJson() , cliAddr , cliPort);
     }
@@ -137,6 +140,7 @@ void LocatingService::broadcast(){
                     result.setIp(host.captured(0));
                     result.setPort(mTcpServerPort);
                     result.setPcName(mPcName);
+                    result.setFileServicePort(mFileServerPort);
 
                     auto json = QJsonDocument(result.serialize()).toJson();
                     broadcastSocket.writeDatagram(json , broadcastAddr , mPort - 1);
