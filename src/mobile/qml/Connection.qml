@@ -44,7 +44,7 @@ Item {
             visible:serverList.count == 0
 
             Text{
-                text : "Cihaz bulunamadı."
+                text : "Device is not found."
                 font.pixelSize: Responsive.v(110)
                 color : "white"
                 font.family: FontCollection.connectionFontName
@@ -115,7 +115,7 @@ Item {
         id : connectButton
         width: Responsive.h(500)
         height: Responsive.v(200)
-        text: "Bağlan"
+        text: "Connect"
         font.pixelSize: Responsive.v(70)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom:parent.bottom
@@ -132,7 +132,7 @@ Item {
         id : refreshButton
         width: Responsive.h(500)
         height: Responsive.v(200)
-        text: "Tekrar Dene"
+        text: "Scan"
         font.pixelSize: Responsive.v(70)
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: Responsive.v(120)

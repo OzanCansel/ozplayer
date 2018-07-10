@@ -5,6 +5,9 @@
 #include <QTcpSocket>
 #include <QMap>
 #include <QPair>
+#include <QDir>
+#include <QCoreApplication>
+#include <QSettings>
 #include "entrylistresult.h"
 
 class PlayerProxy : public QQuickItem
@@ -19,6 +22,8 @@ class PlayerProxy : public QQuickItem
     Q_PROPERTY(int trackStatus READ trackStatus NOTIFY trackStatusChanged)
     Q_PROPERTY(QString currentDirectory READ currentDirectory NOTIFY currentDirectoryChanged)
     Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
+    Q_PROPERTY(double trackPercentage READ trackPercentage NOTIFY trackPercentageChanged)
+    Q_PROPERTY(int trackPosition READ trackPosition NOTIFY trackPositionChanged)
 
 public:
 
@@ -33,6 +38,8 @@ public:
     int trackStatus();
     int volume();
     int similarityScore(QString , QString);
+    double trackPercentage();
+    int trackPosition();
 
 signals:
 
@@ -45,6 +52,9 @@ signals:
     void currentDirectoryChanged();
     void volumeChanged();
     void errorOccured(QString msg);
+    void trackPositionChanged();
+    void trackPercentageChanged();
+    void fileDownloaded(QString);
 
 public slots:
 
@@ -61,6 +71,8 @@ public slots:
     void volumeDown();
     void volumeUp();
     bool fileExists(QString);
+    bool isFolder(QString);
+    QString fileName(QString);
 
 private:
 
@@ -85,13 +97,15 @@ private:
     int mBracketsCount { 0 };
     int mLastIdx { 0 };
     bool mIgnore { false };
-    QTimer mDownloadTimeout;
+    QSettings mSettings{ QDir(QCoreApplication::applicationDirPath()).filePath("settings.ini") , QSettings::IniFormat };
 
     QString mCurrentDirectory;
     QString mCurrentTrack;
     QString mDownloadedFileName;
-    int mTrackStatus;
+    int mTrackStatus { 2 };
     int mVolume { 70 };
+    int mTrackPosition { 0 };
+    double mTrackPercentage { 0 };
 
 };
 

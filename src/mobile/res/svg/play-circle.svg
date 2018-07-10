@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Svg Vector Icons : http://www.onlinewebfonts.com/icon -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 1000 1000"
+   enable-background="new 0 0 1000 1000"
+   xml:space="preserve"
+   id="svg10"
+   sodipodi:docname="play-circle.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"><defs
+   id="defs14" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1017"
+   id="namedview12"
+   showgrid="false"
+   inkscape:zoom="0.236"
+   inkscape:cx="444.91525"
+   inkscape:cy="500"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg10" />
+<metadata
+   id="metadata2"> Svg Vector Icons : http://www.onlinewebfonts.com/icon <rdf:RDF><cc:Work
+     rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata>
+<g
+   id="g8"
+   inkscape:export-filename="C:\Users\ozanc\Documents\projects\ozplayer\src\mobile\res\img\play-circle.png"
+   inkscape:export-xdpi="9.3999996"
+   inkscape:export-ydpi="9.3999996"
+   style="fill:#ffffff;fill-opacity:1"><path
+     d="M417.5,283c-11.6-11.8-39.6-19.6-39.6,3v427.9c0,23,28,14.6,39.6,3l268.2-195.7c11.6-11.8,11.6-30.7,0-42.5L417.5,283z"
+     id="path4"
+     style="fill:#ffffff;fill-opacity:1" /><path
+     d="M500,10C229.8,10,10,229.8,10,500s219.8,490,490,490s490-219.8,490-490S770.2,10,500,10z M500,968C242,968,32.1,758.1,32.1,500C32.1,242,242,32,500,32s467.9,210,467.9,468S758,968,500,968z"
+     id="path6"
+     style="fill:#ffffff;fill-opacity:1" /></g>
+</svg>

@@ -10,6 +10,7 @@ Item {
     property color headerColor : "#1D3262"
 
     property var discovered : []
+    property var lastPositions : []
 
     LinearGradient{
         anchors.fill: parent
@@ -30,6 +31,10 @@ Item {
 
             discovered.push(proxy.currentDirectory)
         }
+        onFileDownloaded : {
+            serverList.model = ({});
+            serverList.model = proxy.entries
+        }
     }
 
     function up(){
@@ -37,6 +42,7 @@ Item {
             return false
         if(proxy.entries[0].isUp){
             proxy.retrieveFiles(proxy.entries[0].path)
+            lastPositions[proxy.currentDirectory] = serverList.currentIndex
             return true
         }
 
@@ -47,8 +53,9 @@ Item {
         z : 2
         id : serverList
         width: parent.width
-        height: parent.height
+        height: parent.height - Responsive.v(250)
         model: proxy.entries
+        clip:true
 
         populate: Transition {
             id: _popuTrans
@@ -60,15 +67,21 @@ Item {
             }
         }
 
+        onCountChanged: {
+            if(lastPositions[proxy.currentDirectory])
+                serverList.currentIndex = lastPositions[proxy.currentDirectory]
+        }
+
         delegate : Item {
             id : delegateItem
             width:parent.width
             height: Responsive.v(150)
             property var fileName : proxy.entries[index].fileName
             property var isFolder : proxy.entries[index].isFolder
-            property var path : proxy.entries[index].path
-            property var isCurrent : delegateItem.path == proxy.currentTrack
-            property var containsCurrent : proxy.currentTrack.indexOf(delegateItem.path) >= 0
+            property string path : proxy.entries[index].path
+            property bool isCurrent : delegateItem.path == proxy.currentTrack
+            property bool containsCurrent : proxy.currentTrack.indexOf(delegateItem.path) >= 0
+            property bool isDownloaded : proxy.fileExists(delegateItem.path) && !delegateItem.isFolder
 
             Row {
                 z : 2
@@ -81,7 +94,7 @@ Item {
                     source: {
                         if(delegateItem.isFolder) return "/res/img/folder.png";
                         if(delegateItem.isCurrent)
-                                return "/res/img/note-playing.png"
+                            return "/res/img/note-playing.png"
 
                         return "/res/img/note.png"
                     }
@@ -101,6 +114,7 @@ Item {
                     font.bold : delegateItem.isCurrent
                     font.family: FontCollection.connectionFontName
                     z:2
+                    font.underline : !osInfo.isAndroid() && isDownloaded
                 }
             }
 
@@ -114,9 +128,9 @@ Item {
                     id : downloadButton
                     width : Responsive.v(100)
                     height: Responsive.h(150)
-                    visible: !delegateItem.isFolder
-                    background: Image{
-                        source: proxy.fileExists(delegateItem.path) ? "/res/img/downloaded.png" : "/res/img/download.png"
+                    visible: !osInfo.isAndroid() && !proxy.fileExists(delegateItem.path) && !delegateItem.isFolder && delegateItem.path.indexOf("downloads") !== 0 &&serverList.currentIndex == index
+                    background: Image {
+                        source: "/res/img/download.png"
                         width: Responsive.v(50)
                         height:Responsive.v(50)
                         fillMode: Image.PreserveAspectFit
@@ -185,8 +199,10 @@ Item {
                 anchors.fill: parent
                 onClicked:  serverList.currentIndex = index
                 onDoubleClicked: {
-                    if(delegateItem.isFolder)
+                    if(delegateItem.isFolder) {
                         proxy.retrieveFiles(delegateItem.path)
+                        lastPositions[proxy.currentDirectory] = serverList.currentIndex
+                    }
                     else {
                         proxy.play(delegateItem.path)
                     }
@@ -204,6 +220,83 @@ Item {
     }
 
     Item {
+        id : currentTrackContainer
+        height : Responsive.v(220)
+        anchors.left:parent.left
+        anchors.right:parent.right
+        anchors.bottom: parent.bottom
+        readonly property bool noTrack : proxy.trackStatus == 2 || proxy.isFolder(proxy.currentTrack)
+
+        Text {
+            text: currentTrackContainer.noTrack ? "No Track" : proxy.fileName(proxy.currentTrack)
+            color : "white"
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: controlButtonsContainer.left
+            anchors.rightMargin: Responsive.h(40)
+            anchors.left: parent.left
+            anchors.leftMargin: Responsive.h(45)
+            font.family: FontCollection.connectionFontName
+            font.pixelSize: Responsive.v(46)
+            horizontalAlignment: Text.AlignLeft
+            z : 2
+            clip: true
+        }
+
+        Button {
+            id : controlButtonsContainer
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: Responsive.h(200)
+            height:parent.height
+            enabled : !currentTrackContainer.noTrack
+            background : Image{
+                source: proxy.trackStatus == 1 ? "/res/img/play-circle.png" : "/res/img/pause-circle.png"
+                width: Responsive.v(110)
+                height: Responsive.h(110)
+                anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
+            }
+            onClicked : {
+                if(proxy.trackStatus == 1)
+                    proxy.resume()
+                else
+                    proxy.pause()
+            }
+
+            z: 2
+        }
+
+        ProgressBar{
+            id : progress
+            value : proxy.trackPercentage
+            width: parent.width
+            height:Responsive.v(2)
+            from : 0
+            to : 1
+
+            background: Rectangle {
+                implicitHeight: progress.height
+                implicitWidth:  progress.width
+                color : "white"
+            }
+
+            contentItem: Item{
+                implicitHeight: progress.height
+                implicitWidth: progress.width
+                Rectangle{
+                    Behavior on width {
+                        NumberAnimation { duration: 500 }
+                    }
+                    width: progress.visualPosition * parent.width
+                    height: parent.height
+                    radius: 2
+                    color: "green"
+                }
+            }
+        }
+    }
+
+    Item {
         id : volumeView
         width : Responsive.h(800)
         height: Responsive.v(120)
@@ -213,7 +306,7 @@ Item {
         visible: false
         z : 2
 
-        Slider{
+        Slider {
             id : volumeSlider
             from : 0
             to : 100
@@ -255,7 +348,6 @@ Item {
     Connections{
         target:proxy
         onVolumeChanged : {
-
             volumeFadeOutAnimation.stop()
             volumeView.visible = true
             volumeView.opacity = 1

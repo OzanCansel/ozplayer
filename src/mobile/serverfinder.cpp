@@ -50,7 +50,6 @@ void ServerFinder::searchTimedout(){
 
 void ServerFinder::checkListenerSocket(){
     if(isEnabled()){
-//        connect(&mListener , &QUdpSocket::readyRead , this , &ServerFinder::ipReceived , Qt::UniqueConnection);
         mListener.bind(24943);
     } else {
         mListener.abort();
@@ -77,6 +76,8 @@ void ServerFinder::ipReceived(){
         ipResult.deserialize(json);
 
         if(exists(ipResult))
+            return;
+        if(ipResult.pcName().isEmpty())
             return;
         QVariantMap variant;
         variant["ip"] = ipResult.ip();
@@ -107,6 +108,8 @@ void ServerFinder::messageIncome(){
 
         ipResult.deserialize(json);
         if(exists(ipResult))
+            return;
+        if(ipResult.pcName().isEmpty())
             return;
         QVariantMap variant;
         variant["ip"] = ipResult.ip();

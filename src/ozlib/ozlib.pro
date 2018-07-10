@@ -42,7 +42,8 @@ SOURCES += \
     osinfo.cpp \
     downloadfilecmd.cpp \
     token.cpp \
-    identifycommand.cpp
+    identifycommand.cpp \
+    trackpositionchanged.cpp
 
 HEADERS += \
         lib.h \
@@ -64,7 +65,8 @@ HEADERS += \
     osinfo.h \
     downloadfilecmd.h \
     token.h \
-    identifycommand.h
+    identifycommand.h \
+    trackpositionchanged.h
 
 unix {
     target.path = /usr/lib

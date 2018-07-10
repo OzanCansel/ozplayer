@@ -29,6 +29,7 @@ private slots:
     void messageIncome();
     void clientDisconnected();
     void mediaStatusChanged(QMediaPlayer::MediaStatus);
+    void trackPositionChanged(qint64);
 
 private:
 
@@ -39,7 +40,7 @@ private:
     QString mBasePath;
     QMediaPlayer mPlayer;
     QString mCurrentTrack;
-    TrackStatus mTrackStatus;
+    TrackStatus mTrackStatus { TrackStatus::Stopped };
     QStringList mPlaylist;
     QString mPlaylistBase;
 

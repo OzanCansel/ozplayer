@@ -17,6 +17,7 @@
         <file>res/img/fullscreen.png</file>
         <file>res/img/windowed.png</file>
         <file>res/img/download.png</file>
-        <file>res/img/downloaded.png</file>
+        <file>res/img/play-circle.png</file>
+        <file>res/img/pause-circle.png</file>
     </qresource>
 </RCC>

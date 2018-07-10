@@ -12,6 +12,7 @@
 #include "resumecommand.h"
 #include "volumenotify.h"
 #include "identifycommand.h"
+#include "trackpositionchanged.h"
 #include "QsLog.h"
 
 using namespace QsLogging;
@@ -19,6 +20,8 @@ using namespace QsLogging;
 void PlayerService::init(){
     connect(&mServer , &QTcpServer::newConnection , this , &PlayerService::newConnection);
     connect(&mPlayer , &QMediaPlayer::mediaStatusChanged , this , &PlayerService::mediaStatusChanged);
+    connect(&mPlayer , &QMediaPlayer::positionChanged , this , &PlayerService::trackPositionChanged);
+    mPlayer.setNotifyInterval(500);
     mServer.listen();
 
 
@@ -231,4 +234,14 @@ void PlayerService::broadcast(QJsonObject&& json){
 
     for(auto socket : mClients)
         socket->waitForBytesWritten();
+}
+
+void PlayerService::trackPositionChanged(qint64 pos){
+    TrackPositionChanged event;
+    auto posInSecs = pos / 1000;
+    auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
+    event.setPosition(posInSecs);
+    event.setPercentage(percentage);
+
+    broadcast(event.serialize());
 }

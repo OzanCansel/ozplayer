@@ -7,7 +7,9 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QTimer>
+#include <QStandardPaths>
 #include <QCoreApplication>
+#include <QThread>
 #include "networkutil.h"
 #include "retrieveentriescommand.h"
 #include "entrylistresult.h"
@@ -20,6 +22,7 @@
 #include "identifycommand.h"
 #include "downloadfilecmd.h"
 #include "token.h"
+#include "trackpositionchanged.h"
 
 void PlayerProxy::registerQmlType(){
     qmlRegisterType<PlayerProxy>("mobile" , 1 , 0 , "PlayerProxy");
@@ -156,7 +159,6 @@ void PlayerProxy::messageIncome(){
 
         if(upDir.second >= 0){
             mEntries.append(entry);
-            emit entriesChanged();
         }
 
         mCurrentDirectory = entries.at(1).first.path();
@@ -226,7 +228,16 @@ void PlayerProxy::messageIncome(){
         IdentifyCommand identifyCmd;
         identifyCmd.deserialize(json);
         mId =  identifyCmd.id();
+    } else if (cmd == TrackPositionChanged::CMD){
+        TrackPositionChanged trackPositionChangedEvent;
+        trackPositionChangedEvent.deserialize(json);
+        mTrackPercentage = trackPositionChangedEvent.percentage();
+        mTrackPosition = trackPositionChangedEvent.position();
+        emit trackPercentageChanged();
+        emit trackPositionChanged();
     }
+
+    messageIncome();
 }
 
 void PlayerProxy::fileIncome(){
@@ -250,7 +261,7 @@ void PlayerProxy::fileIncome(){
         }
         downloadedFile.write(mFileBuffer);
         mFileBuffer.clear();
-        emit entriesChanged();
+        emit fileDownloaded(mDownloadedFileName);
     }
 
     fileIncome();
@@ -311,11 +322,11 @@ void PlayerProxy::downloadFile(QString filePath){
 }
 
 void PlayerProxy::play(QString file){
-    PlayCommand playCmd;
+        PlayCommand playCmd;
 
-    playCmd.setTrack(file);
+        playCmd.setTrack(file);
 
-    mSocket.write(QJsonDocument(playCmd.serialize()).toJson());
+        mSocket.write(QJsonDocument(playCmd.serialize()).toJson());
 }
 
 void PlayerProxy::resume(){
@@ -393,7 +404,7 @@ int PlayerProxy::similarityScore(QString ip, QString str){
 }
 
 QDir PlayerProxy::homeDir(){
-    return QDir(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("local/%0").arg(mId)));
+    return QDir(QDir(mSettings.value("baseDir").toString()).filePath(QStringLiteral("downloads/%0").arg(mId)));
 }
 
 QFileInfo PlayerProxy::translateToLocal(QString filePath){
@@ -404,4 +415,18 @@ bool PlayerProxy::fileExists(QString file){
     return translateToLocal(file).exists();
 }
 
-QTimer
+bool PlayerProxy::isFolder(QString file){
+    return translateToLocal(file).isDir();
+}
+
+QString PlayerProxy::fileName(QString file){
+    return translateToLocal(file).fileName();
+}
+
+double PlayerProxy::trackPercentage(){
+    return mTrackPercentage;
+}
+
+int PlayerProxy::trackPosition(){
+    return mTrackPosition;
+}

@@ -74,7 +74,7 @@ ApplicationWindow {
 
             Item {
                 anchors.right: shutdownButtonItem.left
-                width: Responsive.h(120)
+                width: Responsive.h(100)
                 height: Responsive.v(100)
                 visible: osInfo.isWindows() || osInfo.isUnix()
                 enabled: osInfo.isWindows() || osInfo.isUnix()
@@ -93,8 +93,8 @@ ApplicationWindow {
 
                     Image{
                         source : fullscreenButton.checked ? "/res/img/windowed.png" : "res/img/fullscreen.png"
-                        height: Responsive.v(70)
-                        width: Responsive.h(70)
+                        height: Responsive.v(60)
+                        width: Responsive.h(60)
                         fillMode: Image.PreserveAspectFit
                         y : Responsive.v(10)
                     }
@@ -123,14 +123,14 @@ ApplicationWindow {
                 id : shutdownButtonItem
                 z : 5
                 anchors.right: parent.right
-                width: Responsive.h(120)
+                width: Responsive.h(100)
                 height: Responsive.v(100)
 
                 Item {
 
                     id : shutdownButton
                     anchors.right: parent.right
-                    anchors.rightMargin: Responsive.h(5)
+                    anchors.rightMargin: Responsive.h(0)
                     anchors.top: parent.top
                     anchors.topMargin: Responsive.v(10)
                     width: Responsive.v(100)
@@ -139,8 +139,8 @@ ApplicationWindow {
 
                     Image {
                         source : "res/img/logout.png"
-                        height: Responsive.v(70)
-                        width: Responsive.h(70)
+                        height: Responsive.v(60)
+                        width: Responsive.h(60)
                         fillMode: Image.PreserveAspectFit
                         y : Responsive.v(10)
                     }
@@ -196,11 +196,6 @@ ApplicationWindow {
             proxy: playerProxy
         }
 
-        PlayerControl{
-            id : playerControl
-            proxy: playerProxy
-        }
-
         Keys.onVolumeDownPressed: {
             playerProxy.volumeDown()
             event.accepted = true
@@ -230,6 +225,11 @@ ApplicationWindow {
             playerProxy.volumeDown()
             event.accepted = true
         }
+    }
+
+    PlayerControl{
+        id : playerControl
+        proxy: playerProxy
     }
 
     Image{
