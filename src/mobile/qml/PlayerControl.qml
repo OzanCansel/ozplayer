@@ -46,6 +46,8 @@ Item {
             return true
         }
 
+        proxy.close();
+
         return false
     }
 

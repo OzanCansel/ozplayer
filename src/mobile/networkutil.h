@@ -1,12 +1,12 @@
 #ifndef NETWORKUTIL_H
 #define NETWORKUTIL_H
 
-#include <QString>
+#include <QStringList>
 
 class NetworkUtil
 {
 public:
-    static QString selfAddress();
+    static QStringList selfAddresses();
 };
 
 #endif // NETWORKUTIL_H

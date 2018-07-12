@@ -38,12 +38,12 @@ PlayerProxy::PlayerProxy()
 
 void PlayerProxy::open(QString host, int port){
     close();
-    if(host == NetworkUtil::selfAddress())
+    if(NetworkUtil::selfAddresses().contains(host))
         mSocket.connectToHost(QHostAddress::LocalHost , port);
     else
         mSocket.connectToHost(QHostAddress(host) , port);
 
-    if(!mSocket.waitForConnected(5000)){
+    if(!mSocket.waitForConnected(2500)){
         return;
     }
 
@@ -60,12 +60,13 @@ void PlayerProxy::openFileService(QString host, int port){
         mFileSocket.abort();
         mFileSocket.close();
     }
-    if(host == NetworkUtil::selfAddress())
+    if(NetworkUtil::selfAddresses().contains(host))
         mFileSocket.connectToHost(QHostAddress::LocalHost , port);
     else
         mFileSocket.connectToHost(QHostAddress(host) , port);
 
-    if(!mFileSocket.waitForConnected(5000)){
+    if(!mFileSocket.waitForConnected(2500)){
+        qDebug() << "Could not be connected.";
         return;
     }
 }
@@ -78,6 +79,11 @@ void PlayerProxy::close(){
     if(mSocket.isOpen()){
         mSocket.abort();
         mSocket.close();
+    }
+
+    if(mFileSocket.isOpen()) {
+        mFileSocket.abort();
+        mFileSocket.close();
     }
 
     emit connectedChanged();

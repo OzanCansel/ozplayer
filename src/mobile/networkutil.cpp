@@ -3,13 +3,13 @@
 #include <QNetworkInterface>
 #include <QDebug>
 
-QString NetworkUtil::selfAddress(){
+QStringList NetworkUtil::selfAddresses(){
+    QStringList list;
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
-        qDebug() << address.toString();
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost)){
-            return address.toString();
+            list << address.toString();
         }
     }
 
-    return QString();
+    return list;
 }

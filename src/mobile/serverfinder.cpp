@@ -57,7 +57,6 @@ void ServerFinder::checkListenerSocket(){
 }
 
 void ServerFinder::ipReceived(){
-    qDebug() << "Received";
     QByteArray datagram;
     datagram.resize(int(mListener.pendingDatagramSize()));
     mListener.readDatagram(datagram.data() , datagram.size());
@@ -84,6 +83,7 @@ void ServerFinder::ipReceived(){
         variant["port"] = ipResult.port();
         variant["pcName"] = ipResult.pcName();
         variant["fileServerPort"] = ipResult.fileServicePort();
+        qDebug() << variant;
         mServers.append(variant);
         emit serversChanged();
     }
@@ -115,6 +115,8 @@ void ServerFinder::messageIncome(){
         variant["ip"] = ipResult.ip();
         variant["port"] = ipResult.port();
         variant["pcName"] = ipResult.pcName();
+        variant["fileServerPort"] = ipResult.fileServicePort();
+
         mServers.append(variant);
         emit serversChanged();
     }
@@ -123,7 +125,8 @@ void ServerFinder::messageIncome(){
 bool ServerFinder::exists(PlayerIpResult &ip){
     for(auto variant : mServers){
         if(variant.toMap()["ip"].toString() == ip.ip() &&
-                variant.toMap()["port"].toInt() == ip.port())
+                variant.toMap()["port"].toInt() == ip.port() &&
+                    variant.toMap()["pcName"].toString() == ip.pcName())
             return true;
     }
 

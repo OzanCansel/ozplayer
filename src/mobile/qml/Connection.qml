@@ -119,7 +119,6 @@ Item {
         onClicked: {
             connectToServer(serverList.currentItem.serverIp , serverList.currentItem.port)
             connectToFileServer(serverList.currentItem.serverIp , serverList.currentItem.fileServerPort)
-
         }
     }
 

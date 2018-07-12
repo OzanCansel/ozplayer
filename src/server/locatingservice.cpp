@@ -145,6 +145,7 @@ void LocatingService::broadcast(){
                     auto json = QJsonDocument(result.serialize()).toJson();
                     broadcastSocket.writeDatagram(json , broadcastAddr , mPort - 1);
                     broadcastSocket.waitForBytesWritten();
+                    qDebug() << json;
                 }
             }
         }
