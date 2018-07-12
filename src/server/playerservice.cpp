@@ -113,7 +113,8 @@ void PlayerService::play(PlayCommand& playCmd){
         mPlaylist.clear();
         for(auto entry : trackDir.entryInfoList(QStringList() << "*" , QDir::Files)){
             if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("flac" , Qt::CaseInsensitive))
+                            !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
+                                !entry.suffix().contains("m4a" , Qt::CaseInsensitive))
                 continue;
             mPlaylist.append(entry.filePath());
         }
@@ -159,7 +160,14 @@ void PlayerService::messageIncome(){
         EntryListResult result;
         for(QFileInfo entry : entries){
             if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("flac" , Qt::CaseInsensitive))
+                            !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
+                                !entry.suffix().contains("m4a" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("wma" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("ogg" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("wav" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("ape" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("aac" , Qt::CaseInsensitive) &&
+                            !entry.suffix().contains("oga" , Qt::CaseInsensitive))
                 continue;
 
             EntryInfo entryInfo;

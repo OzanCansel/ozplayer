@@ -140,7 +140,7 @@ echo "Deployed ozplayer as ozplayer.exe"
 
 echo "Copying files..."
 run "cp -r $SCRIPTDIR/installerTemplate/* $INSTALLER_DIR"
-run "cp -r $DEPLOY_DIR/* $INSTALLER_DIR/packages/ide/data"
+run "cp -r $DEPLOY_DIR/* $INSTALLER_DIR/packages/player/data"
 
 echo "Generating installer"
 run "cd $INSTALLER_DIR"

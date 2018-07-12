@@ -52,11 +52,6 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.centerIn: parent
             }
-
-            MouseArea{
-                anchors.fill:parent
-                onClicked: Qt.openUrlExternally("https://www.google.com.tr")
-            }
         }
 
         Item{

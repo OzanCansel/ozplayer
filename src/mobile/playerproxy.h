@@ -73,12 +73,14 @@ public slots:
     bool fileExists(QString);
     bool isFolder(QString);
     QString fileName(QString);
+    QString getDirectoryPath(QString);
 
 private:
 
     void messageIncome();
     void fileIncome();
-    QDir homeDir();
+    QDir downloadsDir();
+    QDir rootDir();
     QFileInfo translateToLocal(QString);
 
 private:

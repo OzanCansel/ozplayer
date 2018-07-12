@@ -154,7 +154,7 @@ void PlayerProxy::messageIncome(){
         QVariantMap entry;
         entry["isFolder"] = upDir.first.isFolder();
         entry["path"] = upDir.first.path();
-        entry["fileName"] = "Yukarı";
+        entry["fileName"] = "Up";
         entry["isUp"] = true;
 
         if(upDir.second >= 0){
@@ -251,7 +251,7 @@ void PlayerProxy::fileIncome(){
     if(endIdx >= 0){
         mFileBuffer.remove(endIdx , mFileBuffer.length() - endIdx);
         mFileBuffer.remove(0 , Token::FileDownloadStartToken.length());
-        auto userHome = homeDir();
+        auto userHome = downloadsDir();
         auto downloadingFile = translateToLocal(mDownloadedFileName);
         userHome.mkpath(downloadingFile.dir().absolutePath());
         QFile downloadedFile(downloadingFile.filePath());
@@ -403,12 +403,17 @@ int PlayerProxy::similarityScore(QString ip, QString str){
     return score;
 }
 
-QDir PlayerProxy::homeDir(){
+
+QDir PlayerProxy::rootDir(){
+    return QDir(mSettings.value("baseDir").toString());
+}
+
+QDir PlayerProxy::downloadsDir(){
     return QDir(QDir(mSettings.value("baseDir").toString()).filePath(QStringLiteral("downloads/%0").arg(mId)));
 }
 
 QFileInfo PlayerProxy::translateToLocal(QString filePath){
-    return QFileInfo(homeDir().filePath(filePath));
+    return QFileInfo(downloadsDir().filePath(filePath));
 }
 
 bool PlayerProxy::fileExists(QString file){
@@ -429,4 +434,8 @@ double PlayerProxy::trackPercentage(){
 
 int PlayerProxy::trackPosition(){
     return mTrackPosition;
+}
+
+QString PlayerProxy::getDirectoryPath(QString path){
+    return rootDir().relativeFilePath(QFileInfo(rootDir().filePath(path)).dir().absolutePath());
 }

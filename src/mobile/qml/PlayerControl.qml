@@ -110,7 +110,7 @@ Item {
                     width: delegateItem.width
                     font.pixelSize: delegateItem.isCurrent ? Responsive.v(46) : Responsive.v(43)
                     anchors.verticalCenter: parent.verticalCenter
-                    color: delegateItem.isCurrent || (delegateItem.isFolder && delegateItem.containsCurrent && delegateItem.fileName != "Yukarı") ? "green" : "white"
+                    color: delegateItem.isCurrent || (delegateItem.isFolder && delegateItem.containsCurrent && delegateItem.fileName != "Up") ? "green" : "white"
                     font.bold : delegateItem.isCurrent
                     font.family: FontCollection.connectionFontName
                     z:2
@@ -240,6 +240,20 @@ Item {
             horizontalAlignment: Text.AlignLeft
             z : 2
             clip: true
+
+            MouseArea{
+                anchors.fill : parent
+                onDoubleClicked: {
+                    var dir = proxy.getDirectoryPath(proxy.currentTrack)
+                    if(dir.indexOf("..") >= 0)
+                        return
+                    if(proxy.currentDirectory === dir)
+                        return
+
+                    proxy.retrieveFiles(dir)
+                    lastPositions[proxy.currentDirectory] = serverList.currentIndex
+                }
+            }
         }
 
         Button {
@@ -251,8 +265,8 @@ Item {
             enabled : !currentTrackContainer.noTrack
             background : Image{
                 source: proxy.trackStatus == 1 ? "/res/img/play-circle.png" : "/res/img/pause-circle.png"
-                width: Responsive.v(110)
-                height: Responsive.h(110)
+                width: Responsive.v(100)
+                height: Responsive.h(100)
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
             }
@@ -363,7 +377,7 @@ Item {
             duration: 2000
         }
 
-        NumberAnimation{
+        NumberAnimation {
             target: volumeView
             property: "opacity"
             from: 1
