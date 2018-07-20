@@ -215,6 +215,12 @@ void PlayerProxy::messageIncome(){
             valueScores.clear();
         }
 
+        for(auto entry : mEntries){
+            if(mEntries.count(entry) > 1){
+                mEntries.removeAll(entry);
+            }
+        }
+
         emit entriesChanged();
     } else if(cmd == CurrentTrackNotify::CMD){
         CurrentTrackNotify ctNotify;

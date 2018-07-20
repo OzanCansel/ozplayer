@@ -4,6 +4,9 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QDebug>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+#include <QRegularExpressionMatchIterator>
 #include "retrieveentriescommand.h"
 #include "entrylistresult.h"
 #include "entryinfo.h"
@@ -23,7 +26,6 @@ void PlayerService::init(){
     connect(&mPlayer , &QMediaPlayer::positionChanged , this , &PlayerService::trackPositionChanged);
     mPlayer.setNotifyInterval(500);
     mServer.listen();
-
 
     QLOG_INFO() << "PlayerService initiated. TcpServer listening " << port();
 }
@@ -107,23 +109,56 @@ void PlayerService::mediaStatusChanged(QMediaPlayer::MediaStatus status){
 
 void PlayerService::play(PlayCommand& playCmd){
     QDir baseDir(mBasePath);
-    QDir trackDir(baseDir.filePath(playCmd.track()));
-    trackDir.cdUp();
-    if(trackDir.path() != mPlaylistBase){
-        mPlaylist.clear();
-        for(auto entry : trackDir.entryInfoList(QStringList() << "*" , QDir::Files)){
-            if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
-                                !entry.suffix().contains("m4a" , Qt::CaseInsensitive))
-                continue;
-            mPlaylist.append(entry.filePath());
+    QFileInfo trackFInfo(baseDir.filePath(playCmd.track()));
+    int mediaPosition = 0 ;
+    //If track doesn't exist, check cuesheet whether they contain the track
+//    if(!trackFInfo.exists()){
+//        for(QFileInfo entry : trackFInfo.dir().entryInfoList(QStringList() << "*.cue")){
+//            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
+//                continue;
+//            auto cuesheet = CueSheet::loadFrom(entry.filePath());
+
+//            //Iterate cuesheet entries
+//            for(auto trackEntry : cuesheet.entries()){
+
+//                if(playCmd.track().contains(trackEntry.displayName())){
+//                    mCurrentTrack = cuesheet.musicFile();
+//                    mediaPosition = trackEntry.startIndexes().first().toMillis();
+//                    mPlaylist.clear();
+//                    mPlaylist.append(mCurrentTrack);
+//                    mPlayingFromCuesheet = true;
+//                    mCuesheet = cuesheet;
+//                }
+//            }
+//        }
+//    } else {
+        QDir trackDir(baseDir.filePath(playCmd.track()));
+        trackDir.cdUp();
+        if(trackDir.path() != mPlaylistBase){
+            mPlaylist.clear();
+            for(QFileInfo entry : trackDir.entryInfoList(QStringList() << "*" , QDir::Files)){
+                if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("m4a" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("wma" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("ogg" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("wav" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("ape" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("aac" , Qt::CaseInsensitive) &&
+                        !entry.suffix().contains("oga" , Qt::CaseInsensitive))
+                    continue;
+                mPlaylist.append(entry.filePath());
+            }
+            mPlaylistBase = trackDir.path();
         }
-        mPlaylistBase = trackDir.path();
-    }
-    mCurrentTrack = baseDir.filePath(playCmd.track());
+        mCurrentTrack = baseDir.filePath(playCmd.track());
+        mPlayingFromCuesheet = false;
+//    }
+
 
     mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
     mPlayer.play();
+    mPlayer.setPosition(mediaPosition);
 
     mTrackStatus = TrackStatus::Playing;
 
@@ -158,16 +193,45 @@ void PlayerService::messageIncome(){
         auto entries = requestedDir.entryInfoList();
 
         EntryListResult result;
+        QStringList ignoredFiles;
+
+        for(QFileInfo entry : entries){
+            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
+                continue;
+
+//            auto sheet = CueSheet::loadFrom(entry.filePath());
+//            if(!QFileInfo(sheet.musicFile()).exists())
+//                continue;
+//            if(ignoredFiles.contains(sheet.musicFile()))
+//                continue;
+//            ignoredFiles.append(sheet.musicFile());
+
+//            for(auto sheetEntry : sheet.entries()){
+//                EntryInfo entryInfo;
+//                entryInfo.setIsFolder(false);
+//                entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.dir().filePath(sheetEntry.displayName())));
+//                if(ignoredFiles.contains(entryInfo.path()))
+//                    continue;
+//                result.entries().append(entryInfo);
+//                ignoredFiles << entryInfo.path();
+//            }
+        }
+
+
         for(QFileInfo entry : entries){
             if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
-                                !entry.suffix().contains("m4a" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("wma" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("ogg" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("wav" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("ape" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("aac" , Qt::CaseInsensitive) &&
-                            !entry.suffix().contains("oga" , Qt::CaseInsensitive))
+                    !entry.suffix().contains("flac" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("m4a" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("wma" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("ogg" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("wav" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("ape" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("aac" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("oga" , Qt::CaseInsensitive))
+                continue;
+
+            //Check ignored files
+            if(ignoredFiles.contains(entry.filePath()))
                 continue;
 
             EntryInfo entryInfo;
@@ -246,10 +310,41 @@ void PlayerService::broadcast(QJsonObject&& json){
 
 void PlayerService::trackPositionChanged(qint64 pos){
     TrackPositionChanged event;
-    auto posInSecs = pos / 1000;
-    auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
-    event.setPosition(posInSecs);
-    event.setPercentage(percentage);
+
+//    if(mPlayingFromCuesheet){
+//        if(pos == 0)
+//            return;
+//        auto entry = mCuesheet.getEntryByPos(pos);
+//        if(entry.title().isEmpty())
+//            return;
+//        qDebug() << entry.title();
+//        if(entry.title() != mCurrentEntry.title()){
+//            mCurrentEntry = entry;
+
+//            CurrentTrackNotify notify;
+//            notify.setStatus(mTrackStatus);
+//            notify.setPath(QDir(mBasePath).relativeFilePath(QFileInfo(mCuesheet.musicFile()).dir().filePath(mCurrentEntry.displayName())));
+//            broadcast(notify.serialize());
+//        }
+
+//        auto start = mCurrentEntry.startIndexes()[0].toMillis();
+//        auto finish = mCurrentEntry.finishIndex().toMillis();
+//        auto posInSecs = (pos - start) / 1000;
+//        auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
+//        if(finish < start){
+//            percentage = mPlayer.duration() > 0 ? (pos - start) / static_cast<double>(mPlayer.duration() - start) : 0;
+//        } else {
+//            percentage = (pos - start) / static_cast<double>(finish - start);
+//        }
+
+//        event.setPosition(posInSecs);
+//        event.setPercentage(percentage);
+//    } else {
+        auto posInSecs = pos / 1000;
+        auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
+        event.setPosition(posInSecs);
+        event.setPercentage(percentage);
+//    }
 
     broadcast(event.serialize());
 }

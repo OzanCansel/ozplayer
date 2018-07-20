@@ -20,13 +20,19 @@ SOURCES += \
     locatingservice.cpp \
     playerservice.cpp \
     windowsservice.cpp \
-    fileservice.cpp
+    fileservice.cpp \
+    cuesheet.cpp \
+    cuesheetfileentry.cpp \
+    cuesheettrackentry.cpp
 
 HEADERS += \
     locatingservice.h \
     playerservice.h \
     windowsservice.h \
-    fileservice.h
+    fileservice.h \
+    cuesheet.h \
+    cuesheetfileentry.h \
+    cuesheettrackentry.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../ozlib/release/ -lozlib
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../ozlib/debug/ -lozlib

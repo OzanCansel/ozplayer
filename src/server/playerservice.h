@@ -7,6 +7,7 @@
 #include <QMediaPlayer>
 #include "currenttracknotify.h"
 #include "playcommand.h"
+#include "cuesheet.h"
 
 class PlayerService : public QObject
 {
@@ -34,15 +35,20 @@ private slots:
 private:
 
     void broadcast(QJsonObject&&);
-
+    QMediaPlayer mPlayer;
     QTcpServer  mServer;
     QList<QTcpSocket*> mClients;
+
     QString mBasePath;
-    QMediaPlayer mPlayer;
     QString mCurrentTrack;
     TrackStatus mTrackStatus { TrackStatus::Stopped };
     QStringList mPlaylist;
     QString mPlaylistBase;
+
+    CueSheetTrackEntry mCurrentEntry;
+    CueSheet mCuesheet;
+    bool mPlayingFromCuesheet { false };
+    int mTrackFinishedAt { 0 };
 
 };
 
