@@ -18,13 +18,13 @@ Item {
         proxy.openFileService(host , port);
     }
 
-    Column{
+    Column {
         width:parent.width
         height:parent.height
         y : Responsive.v(100)
         spacing: Responsive.v(50)
 
-        Item{
+        Item {
             anchors.horizontalCenter: parent.horizontalCenter
             height: Responsive.v(200)
             width: parent.width
@@ -38,14 +38,14 @@ Item {
             }
         }
 
-        Item{
+        Item {
             width:parent.width
             height: Responsive.v(900)
             visible:serverList.count == 0
 
             Text{
                 text : "Device is not found."
-                font.pixelSize: Responsive.v(110)
+                font.pixelSize: Responsive.v(90)
                 color : "white"
                 font.family: FontCollection.connectionFontName
                 horizontalAlignment: Text.AlignHCenter

@@ -99,11 +99,31 @@ QString PlayerService::basePath(){
 
 void PlayerService::mediaStatusChanged(QMediaPlayer::MediaStatus status){
     if(status == QMediaPlayer::EndOfMedia){
-        auto idx = mPlaylist.indexOf(mCurrentTrack);
-        idx = mPlaylist.length() - 1 <= idx ? 0 : idx + 1;
-        PlayCommand playCmd;
-        playCmd.setTrack(QDir(mBasePath).relativeFilePath(mPlaylist.at(idx)));
-        play(playCmd);
+        if(mPlayingFromCuesheet){
+            for(auto i = 0; i < mCuesheet.files().length(); ++i){
+                auto file = mCuesheet.files().at(i);
+                if(file == mCurrentFile){
+                    auto idx = 0;
+                    if( (i + 1) < mCuesheet.files().length())
+                        idx = i + 1;
+
+                    auto nextFile = mCuesheet.files().at(idx);
+                    mCurrentTrack = nextFile->musicFile();
+                    mCurrentFile = nextFile;
+                    mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
+                    mPlayer.play();
+
+
+                    mTrackStatus = TrackStatus::Playing;
+                }
+            }
+        } else {
+            auto idx = mPlaylist.indexOf(mCurrentTrack);
+            idx = mPlaylist.length() - 1 <= idx ? 0 : idx + 1;
+            PlayCommand playCmd;
+            playCmd.setTrack(QDir(mBasePath).relativeFilePath(mPlaylist.at(idx)));
+            play(playCmd);
+        }
     }
 }
 
@@ -111,27 +131,32 @@ void PlayerService::play(PlayCommand& playCmd){
     QDir baseDir(mBasePath);
     QFileInfo trackFInfo(baseDir.filePath(playCmd.track()));
     int mediaPosition = 0 ;
+
     //If track doesn't exist, check cuesheet whether they contain the track
-//    if(!trackFInfo.exists()){
-//        for(QFileInfo entry : trackFInfo.dir().entryInfoList(QStringList() << "*.cue")){
-//            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
-//                continue;
-//            auto cuesheet = CueSheet::loadFrom(entry.filePath());
+    if(!trackFInfo.exists()){
+        for(QFileInfo entry : trackFInfo.dir().entryInfoList(QStringList() << "*.cue")){
+            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
+                continue;
+            auto cuesheet = CueSheet::loadFrom(entry.filePath());
 
-//            //Iterate cuesheet entries
-//            for(auto trackEntry : cuesheet.entries()){
-
-//                if(playCmd.track().contains(trackEntry.displayName())){
-//                    mCurrentTrack = cuesheet.musicFile();
-//                    mediaPosition = trackEntry.startIndexes().first().toMillis();
-//                    mPlaylist.clear();
-//                    mPlaylist.append(mCurrentTrack);
-//                    mPlayingFromCuesheet = true;
-//                    mCuesheet = cuesheet;
-//                }
-//            }
-//        }
-//    } else {
+            //Iterate cuesheet entries
+            for(auto file : cuesheet.files()) {
+                for(auto trackEntry : file->tracks()){
+                    if(playCmd.track().contains(trackEntry->displayName())){
+                        mCurrentTrack = file->musicFile();
+                        mediaPosition = trackEntry->startIndexes().first().millis;
+                        mPlaylist.clear();
+                        mPlaylist.append(mCurrentTrack);
+                        mPlayingFromCuesheet = true;
+                        mCuesheet = cuesheet;
+                        mCurrentFile = file;
+                        mCurrentEntry = trackEntry;
+                        break;
+                    }
+                }
+            }
+        }
+    } else {
         QDir trackDir(baseDir.filePath(playCmd.track()));
         trackDir.cdUp();
         if(trackDir.path() != mPlaylistBase){
@@ -153,7 +178,7 @@ void PlayerService::play(PlayCommand& playCmd){
         }
         mCurrentTrack = baseDir.filePath(playCmd.track());
         mPlayingFromCuesheet = false;
-//    }
+    }
 
 
     mPlayer.setMedia(QUrl::fromLocalFile(mCurrentTrack));
@@ -194,29 +219,6 @@ void PlayerService::messageIncome(){
 
         EntryListResult result;
         QStringList ignoredFiles;
-
-        for(QFileInfo entry : entries){
-            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
-                continue;
-
-//            auto sheet = CueSheet::loadFrom(entry.filePath());
-//            if(!QFileInfo(sheet.musicFile()).exists())
-//                continue;
-//            if(ignoredFiles.contains(sheet.musicFile()))
-//                continue;
-//            ignoredFiles.append(sheet.musicFile());
-
-//            for(auto sheetEntry : sheet.entries()){
-//                EntryInfo entryInfo;
-//                entryInfo.setIsFolder(false);
-//                entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.dir().filePath(sheetEntry.displayName())));
-//                if(ignoredFiles.contains(entryInfo.path()))
-//                    continue;
-//                result.entries().append(entryInfo);
-//                ignoredFiles << entryInfo.path();
-//            }
-        }
-
 
         for(QFileInfo entry : entries){
             if(!entry.isDir() && !entry.suffix().contains("MP3" , Qt::CaseInsensitive) &&
@@ -311,40 +313,41 @@ void PlayerService::broadcast(QJsonObject&& json){
 void PlayerService::trackPositionChanged(qint64 pos){
     TrackPositionChanged event;
 
-//    if(mPlayingFromCuesheet){
-//        if(pos == 0)
-//            return;
-//        auto entry = mCuesheet.getEntryByPos(pos);
-//        if(entry.title().isEmpty())
-//            return;
-//        qDebug() << entry.title();
-//        if(entry.title() != mCurrentEntry.title()){
-//            mCurrentEntry = entry;
+    if(mPlayingFromCuesheet){
+        if(pos == 0)
+            return;
 
-//            CurrentTrackNotify notify;
-//            notify.setStatus(mTrackStatus);
-//            notify.setPath(QDir(mBasePath).relativeFilePath(QFileInfo(mCuesheet.musicFile()).dir().filePath(mCurrentEntry.displayName())));
-//            broadcast(notify.serialize());
-//        }
+        auto entry = mCurrentFile->getTrackByPos(pos);
+        if(entry.isNull())
+            return;
+        qDebug() << entry->title();
+        if(entry->title() != mCurrentEntry->title()){
+            mCurrentEntry = entry;
 
-//        auto start = mCurrentEntry.startIndexes()[0].toMillis();
-//        auto finish = mCurrentEntry.finishIndex().toMillis();
-//        auto posInSecs = (pos - start) / 1000;
-//        auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
-//        if(finish < start){
-//            percentage = mPlayer.duration() > 0 ? (pos - start) / static_cast<double>(mPlayer.duration() - start) : 0;
-//        } else {
-//            percentage = (pos - start) / static_cast<double>(finish - start);
-//        }
+            CurrentTrackNotify notify;
+            notify.setStatus(mTrackStatus);
+            notify.setPath(QDir(mBasePath).relativeFilePath(QFileInfo(mCurrentFile->musicFile()).dir().filePath(mCurrentEntry->displayName())));
+            broadcast(notify.serialize());
+        }
 
-//        event.setPosition(posInSecs);
-//        event.setPercentage(percentage);
-//    } else {
+        auto start = mCurrentEntry->startIndexes()[0].millis;
+        auto finish = mCurrentEntry->finishIndex().millis;
+        auto posInSecs = (pos - start) / 1000;
+        auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
+        if(finish < start){
+            percentage = mPlayer.duration() > 0 ? (pos - start) / static_cast<double>(mPlayer.duration() - start) : 0;
+        } else {
+            percentage = (pos - start) / static_cast<double>(finish - start);
+        }
+
+        event.setPosition(posInSecs);
+        event.setPercentage(percentage);
+    } else {
         auto posInSecs = pos / 1000;
         auto percentage = mPlayer.duration() > 0.0 ? static_cast<double>(pos) / mPlayer.duration() : 0;
         event.setPosition(posInSecs);
         event.setPercentage(percentage);
-//    }
+    }
 
     broadcast(event.serialize());
 }

@@ -87,10 +87,15 @@ Item {
 
             Row {
                 z : 2
-                anchors.fill : parent
+//                anchors.fill : parent
+                anchors.top : parent.top
+                anchors.bottom : parent.bottom
+                anchors.left : parent.left
+                anchors.right : controlButtonsRow.left
                 anchors.leftMargin: Responsive.h(35)
-                anchors.rightMargin:  Responsive.h(35)
+                anchors.rightMargin:  Responsive.h(15)
                 spacing : Responsive.h(30)
+                clip : true
 
                 Image {
                     source: {
@@ -121,10 +126,12 @@ Item {
             }
 
             Row {
+                id : controlButtonsRow
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 z : 3
                 enabled : !delegateItem.isFolder
+
 
                 Button {
                     id : downloadButton

@@ -132,3 +132,8 @@ bool ServerFinder::exists(PlayerIpResult &ip){
 
     return false;
 }
+
+void ServerFinder::clearServers(){
+    mServers.clear();
+    emit serversChanged();
+}

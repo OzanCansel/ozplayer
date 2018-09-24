@@ -12,6 +12,7 @@ public:
     QString musicFile();
     void setMusicFile(QString);
     QList<QSharedPointer<CueSheetTrackEntry>>& tracks();
+    QSharedPointer<CueSheetTrackEntry> getTrackByPos(long);
 
 private:
 

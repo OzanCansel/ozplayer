@@ -23,6 +23,7 @@ public:
 public slots:
 
     void search();
+    void clearServers();
 
 private slots:
 

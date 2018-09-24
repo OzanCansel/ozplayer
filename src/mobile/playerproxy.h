@@ -74,6 +74,7 @@ public slots:
     bool isFolder(QString);
     QString fileName(QString);
     QString getDirectoryPath(QString);
+    void playerSocketDisconnected();
 
 private:
 

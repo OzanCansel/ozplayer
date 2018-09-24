@@ -45,8 +45,9 @@ private:
     QStringList mPlaylist;
     QString mPlaylistBase;
 
-    CueSheetTrackEntry mCurrentEntry;
+    QSharedPointer<CueSheetTrackEntry> mCurrentEntry;
     CueSheet mCuesheet;
+    QSharedPointer<CueSheetFileEntry> mCurrentFile;
     bool mPlayingFromCuesheet { false };
     int mTrackFinishedAt { 0 };
 

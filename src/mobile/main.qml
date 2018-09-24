@@ -180,11 +180,13 @@ ApplicationWindow {
             else if(stack.depth > 1){
                 while(stack.depth == 1)
                     stack.pop()
+
+                serverFinder.clearServers()
             }
         }
     }
 
-    StackView{
+    StackView {
         id:stack
         z : 3
         anchors.fill:parent

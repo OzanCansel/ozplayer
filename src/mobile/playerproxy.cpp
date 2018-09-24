@@ -31,6 +31,7 @@ void PlayerProxy::registerQmlType(){
 PlayerProxy::PlayerProxy()
 {
     connect(&mSocket , &QTcpSocket::readyRead , this , &PlayerProxy::messageIncome);
+    connect(&mSocket , &QTcpSocket::disconnected , this , &PlayerProxy::playerSocketDisconnected);
     connect(&mFileSocket , &QTcpSocket::readyRead , this, &PlayerProxy::fileIncome);
     mVolume = 70;
     emit volumeChanged();
@@ -86,6 +87,10 @@ void PlayerProxy::close(){
         mFileSocket.close();
     }
 
+    emit connectedChanged();
+}
+
+void PlayerProxy::playerSocketDisconnected(){
     emit connectedChanged();
 }
 
@@ -213,12 +218,6 @@ void PlayerProxy::messageIncome(){
 
             mEntries.append(entryVariant);
             valueScores.clear();
-        }
-
-        for(auto entry : mEntries){
-            if(mEntries.count(entry) > 1){
-                mEntries.removeAll(entry);
-            }
         }
 
         emit entriesChanged();
