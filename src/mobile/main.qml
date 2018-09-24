@@ -177,12 +177,12 @@ ApplicationWindow {
         onConnectedChanged: {
             if(connected)
                 stack.push(playerControl)
-            else if(stack.depth > 1){
-                while(stack.depth == 1)
-                    stack.pop()
+        }
+        onDisconnected : {
+            while(stack.depth > 1)
+                stack.pop()
 
-                serverFinder.clearServers()
-            }
+            serverFinder.clearServers()
         }
     }
 

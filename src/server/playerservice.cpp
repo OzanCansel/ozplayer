@@ -133,27 +133,26 @@ void PlayerService::play(PlayCommand& playCmd){
     int mediaPosition = 0 ;
 
     //If track doesn't exist, check cuesheet whether they contain the track
-    if(!trackFInfo.exists()){
-        for(QFileInfo entry : trackFInfo.dir().entryInfoList(QStringList() << "*.cue")){
-            if(!entry.suffix().contains("cue" , Qt::CaseInsensitive))
-                continue;
-            auto cuesheet = CueSheet::loadFrom(entry.filePath());
+    auto cueFile = QFileInfo(trackFInfo.dir().absolutePath());
+    if(cueFile.suffix().contains("cue" , Qt::CaseInsensitive)){
+        auto cuesheet = CueSheet::loadFrom(cueFile.filePath());
 
-            //Iterate cuesheet entries
-            for(auto file : cuesheet.files()) {
-                for(auto trackEntry : file->tracks()){
-                    if(playCmd.track().contains(trackEntry->displayName())){
-                        mCurrentTrack = file->musicFile();
-                        mediaPosition = trackEntry->startIndexes().first().millis;
-                        mPlaylist.clear();
-                        mPlaylist.append(mCurrentTrack);
-                        mPlayingFromCuesheet = true;
-                        mCuesheet = cuesheet;
-                        mCurrentFile = file;
-                        mCurrentEntry = trackEntry;
-                        break;
-                    }
-                }
+        if(cuesheet.files().isEmpty())
+            return;
+
+        auto file = cuesheet.files().first();
+        //Iterate cuesheet entries
+        for(auto trackEntry : file->tracks()){
+            if(playCmd.track().contains(trackEntry->displayName())){
+                mCurrentTrack = file->musicFile();
+                mediaPosition = trackEntry->startIndexes().first().millis;
+                mPlaylist.clear();
+                mPlaylist.append(mCurrentTrack);
+                mPlayingFromCuesheet = true;
+                mCuesheet = cuesheet;
+                mCurrentFile = file;
+                mCurrentEntry = trackEntry;
+                break;
             }
         }
     } else {
@@ -209,13 +208,42 @@ void PlayerService::messageIncome(){
         //Deserialize
         retrieveEntriesCmd.deserialize(json);
 
-        QLOG_INFO() << retrieveEntriesCmd.path().toUtf8();
-
+        QFileInfo requestedPath(QDir(mBasePath).filePath(retrieveEntriesCmd.path()));
         QDir requestedDir(mBasePath);
         requestedDir.cd(retrieveEntriesCmd.path());
 
         requestedDir.setSorting(QDir::DirsFirst);
         auto entries = requestedDir.entryInfoList();
+
+        //If cue sheet requested
+        if(requestedPath.isFile() && requestedPath.suffix() == "cue"){
+            auto sheet = CueSheet::loadFrom(requestedPath.filePath());
+            if(sheet.files().isEmpty())
+                return;
+            auto file = sheet.files().first();
+            EntryListResult result;
+
+            EntryInfo currentDirEntry;
+            currentDirEntry.setIsFolder(true);
+            currentDirEntry.setPath(QDir(mBasePath).relativeFilePath(requestedPath.filePath()));
+            result.entries().append(currentDirEntry);
+            EntryInfo upDirEntry;
+            upDirEntry.setIsFolder(true);
+            upDirEntry.setPath(QDir(mBasePath).relativeFilePath(requestedPath.dir().absolutePath()));
+            result.entries().append(upDirEntry);
+
+            for(auto track : file->tracks()){
+                track->trackName();
+
+                EntryInfo entryInfo;
+                entryInfo.setIsFolder(false);
+                entryInfo.setPath(QDir(mBasePath).relativeFilePath(requestedPath.filePath()).append("/").append(track->displayName()));
+                result.entries().append(entryInfo);
+            }
+
+            socket->write(QJsonDocument(result.serialize()).toJson());
+            return;
+        }
 
         EntryListResult result;
         QStringList ignoredFiles;
@@ -229,7 +257,8 @@ void PlayerService::messageIncome(){
                     !entry.suffix().contains("wav" , Qt::CaseInsensitive) &&
                     !entry.suffix().contains("ape" , Qt::CaseInsensitive) &&
                     !entry.suffix().contains("aac" , Qt::CaseInsensitive) &&
-                    !entry.suffix().contains("oga" , Qt::CaseInsensitive))
+                    !entry.suffix().contains("oga" , Qt::CaseInsensitive) &&
+                    !entry.suffix().contains("cue" , Qt::CaseInsensitive))
                 continue;
 
             //Check ignored files
@@ -237,10 +266,9 @@ void PlayerService::messageIncome(){
                 continue;
 
             EntryInfo entryInfo;
-            entryInfo.setIsFolder(entry.isDir());
+            entryInfo.setIsFolder(entry.suffix().contains("cue" , Qt::CaseInsensitive) ? true : entry.isDir());
             entryInfo.setPath(QDir(mBasePath).relativeFilePath(entry.filePath().toUtf8()));
             result.entries().append(entryInfo);
-            QLOG_INFO() << "   " << entryInfo.path() << " added.";
         }
 
         socket->write(QJsonDocument(result.serialize()).toJson());
@@ -277,7 +305,6 @@ void PlayerService::messageIncome(){
         VolumeNotify notify;
         notify.setVolume(mPlayer.volume());
         broadcast(notify.serialize());
-        QLOG_INFO() << "volumeUp => " << volume;
     } else if(cmd == "volumeDown"){
         auto volume = mPlayer.volume() - 5;
         if(volume < 0)
@@ -286,7 +313,6 @@ void PlayerService::messageIncome(){
         VolumeNotify notify;
         notify.setVolume(mPlayer.volume());
         broadcast(notify.serialize());
-        QLOG_INFO() << "volumeDown => " << volume;
     } else if(cmd == "getCurrentTrack"){
         CurrentTrackNotify notify;
         notify.setStatus(mTrackStatus);
@@ -320,13 +346,12 @@ void PlayerService::trackPositionChanged(qint64 pos){
         auto entry = mCurrentFile->getTrackByPos(pos);
         if(entry.isNull())
             return;
-        qDebug() << entry->title();
         if(entry->title() != mCurrentEntry->title()){
             mCurrentEntry = entry;
 
             CurrentTrackNotify notify;
             notify.setStatus(mTrackStatus);
-            notify.setPath(QDir(mBasePath).relativeFilePath(QFileInfo(mCurrentFile->musicFile()).dir().filePath(mCurrentEntry->displayName())));
+            notify.setPath(QDir(mBasePath).relativeFilePath(mCuesheet.path()).append("/").append(mCurrentEntry->displayName()));
             broadcast(notify.serialize());
         }
 

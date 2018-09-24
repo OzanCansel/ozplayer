@@ -46,6 +46,7 @@ signals:
     void ipChanged();
     void portChanged();
     void connectedChanged();
+    void disconnected();
     void entriesChanged();
     void currentTrackChanged();
     void trackStatusChanged();

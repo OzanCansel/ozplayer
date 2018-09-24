@@ -16,6 +16,8 @@ CueSheet CueSheet::loadFrom(QString filePath){
     if(!cueFile.open(QIODevice::ReadOnly))
         return sheet;
 
+    sheet.setPath(filePath);
+
     QTextStream ss(&cueFile);
     //Read file
     auto fileContent = ss.readAll();
@@ -87,4 +89,12 @@ CueSheet CueSheet::loadFrom(QString filePath){
 
 QList<QSharedPointer<CueSheetFileEntry>>& CueSheet::files(){
     return mFiles;
+}
+
+QString CueSheet::path(){
+    return mPath;
+}
+
+void CueSheet::setPath(QString path) {
+    mPath = path;
 }

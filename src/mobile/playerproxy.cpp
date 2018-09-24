@@ -91,7 +91,7 @@ void PlayerProxy::close(){
 }
 
 void PlayerProxy::playerSocketDisconnected(){
-    emit connectedChanged();
+    emit disconnected();
 }
 
 void PlayerProxy::messageIncome(){

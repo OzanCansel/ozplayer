@@ -13,10 +13,13 @@ public:
 
     static CueSheet loadFrom(QString filePath);
     QList<QSharedPointer<CueSheetFileEntry>>& files();
+    QString path();
+    void setPath(QString);
 
 private:
 
     QList<QSharedPointer<CueSheetFileEntry>> mFiles;
+    QString mPath;
 
 };
 
